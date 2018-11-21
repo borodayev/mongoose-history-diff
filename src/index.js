@@ -37,4 +37,24 @@ export default function plugin(schema: MongooseSchema<any>, options: ?OptionsT) 
       this._original = null;
     }
   });
+
+  schema.post('findOneAndUpdate', function(doc, next) {
+    const rhs = this._update.$set;
+    const isReturnNew = this.options?.new;
+    console.log(isReturnNew);
+
+    console.log(rhs);
+    console.log(doc);
+    next();
+  });
+
+  // schema.pre('update', function(next) {
+  //   const d = this._update.$set || this._update;
+  //   next();
+  // });
+
+  // schema.pre('updateOne', function(next) {
+  //   const d = this._update.$set || this._update;
+  //   next();
+  // });
 }

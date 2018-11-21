@@ -35,4 +35,18 @@ describe('plugin', () => {
     expect(diffs[1].changes[0].index).toBe(1);
     expect(diffs[1].changes[0].item.rhs.name).toBe('second');
   });
+
+  it.only('findOneAndUpdate', async () => {
+    await Post.create({ title: 'test' });
+    const post: PostDoc = (await Post.findOneAndUpdate(
+      { title: 'test' },
+      { $set: { title: 'testUpdated' } },
+      { new: false }
+    ).exec(): any);
+
+    expect(post.title).toBe('testUpdated');
+
+    // const Diff = Post.diffModel();
+    // const diffs = await Diff.find({}).exec();
+  });
 });
