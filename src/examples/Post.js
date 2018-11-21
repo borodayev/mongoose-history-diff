@@ -13,6 +13,7 @@ export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
       type: String,
       description: 'Provider who send Post',
     },
+    subjects: [{ name: String }],
   },
   {
     versionKey: false,
@@ -23,6 +24,7 @@ export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
 
 export class PostDoc /* :: extends Mongoose$Document */ {
   title: string;
+  subjects: Array<{ name: string }>;
 
   /* :: static diffModel(): any {} */
 }
