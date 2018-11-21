@@ -6,6 +6,29 @@ export default function(
   mongooseConnection: MongooseConnection,
   collectionName: string
 ): MongooseModel {
+  const ItemSchema = new Schema(
+    {
+      kind: {
+        type: String,
+        enum: ['E', 'N', 'D', 'A'],
+      },
+      lhs: Schema.Types.Mixed,
+      rhs: Schema.Types.Mixed,
+    },
+    {
+      _id: false,
+      versionKey: false,
+    }
+  );
+
+  class ItemDoc /* :: extends Mongoose$Document */ {
+    kind: 'E' | 'N' | 'D' | 'A';
+    lhs: any;
+    rhs: any;
+  }
+
+  ItemSchema.loadClass(ItemDoc);
+
   const ChangeSchema = new Schema(
     {
       kind: {
@@ -15,6 +38,8 @@ export default function(
       path: [String],
       lhs: Schema.Types.Mixed,
       rhs: Schema.Types.Mixed,
+      index: Number,
+      item: ItemSchema,
     },
     {
       _id: false,
@@ -27,6 +52,8 @@ export default function(
     path: Array<string>;
     lhs: any;
     rhs: any;
+    index: ?number;
+    item: ?ItemDoc;
   }
 
   ChangeSchema.loadClass(ChangeDoc);
