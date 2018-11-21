@@ -1,15 +1,11 @@
 // @flow
 
-import { Schema, type ObjectId } from 'mongoose';
-import type { OptionsT } from './index';
+import { Schema, type ObjectId, type MongooseModel, type MongooseConnection } from 'mongoose';
 
-export default function(options: OptionsT): any {
-  const { mongooseConnection, diffCollectionName } = options || {};
-  if (!mongooseConnection)
-    throw new Error(`You should provide a mongoose connection instance to plugin options!`);
-
-  if (!diffCollectionName) throw new Error(`You should provide a name for diff collection!`);
-
+export default function(
+  mongooseConnection: MongooseConnection,
+  collectionName: string
+): MongooseModel {
   const ChangeSchema = new Schema(
     {
       kind: {
@@ -40,10 +36,11 @@ export default function(options: OptionsT): any {
       docId: Schema.Types.ObjectId,
       changes: [ChangeSchema],
     },
-    { versionKey: false, timestamps: true }
+    { versionKey: false, timestamps: true, collection: collectionName }
   );
 
   class DiffDoc /* :: extends Mongoose$Document */ {
+    // $FlowFixMe
     _id: ObjectId;
     docId: ObjectId;
     changes: Array<ChangeDoc>;
@@ -56,6 +53,11 @@ export default function(options: OptionsT): any {
 
   DiffSchema.index({ docId: 1 });
   DiffSchema.loadClass(DiffDoc);
+  const modelName: string = `${collectionName}_Model`;
 
-  return mongooseConnection.model(diffCollectionName, DiffSchema);
+  if (Object.keys(mongooseConnection.models).includes(modelName)) {
+    return (mongooseConnection.models[modelName]: any);
+  }
+
+  return mongooseConnection.model(modelName, DiffSchema);
 }
