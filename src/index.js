@@ -22,11 +22,17 @@ export default function plugin(schema: MongooseSchema<any>, options: ?OptionsT) 
   });
 
   schema.pre('save', async function() {
+    // && this._original
     if (!this.isNew) {
       const lhs = this._original;
       const rhs = this.toObject();
+
       const Diff = this.constructor.diffModel();
-      const diffs = deepDiff.diff(lhs, rhs);
+      const diffs = deepDiff.diff(
+        lhs,
+        rhs,
+        (path, key) => path.length === 0 && ['updatedAt', 'createdAt'].includes(key)
+      );
       if (diffs?.length > 0) await Diff.createDiff(lhs._id, diffs);
       this._original = null;
     }
