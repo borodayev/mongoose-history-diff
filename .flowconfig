@@ -35,8 +35,10 @@
 .*/node_modules/yargs.*
 
 [include]
+./flow-typed/mongoose_v5.x.x.js
 
 [libs]
+./flow-typed/mongoose_v5.x.x.js
 
 [options]
 esproposal.class_instance_fields=enable
