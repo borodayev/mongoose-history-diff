@@ -2,10 +2,10 @@
 /* eslint-disable no-param-reassign, func-names */
 
 import mongoose, { type MongooseSchema } from 'mongoose';
-import DiffPlugin from '../index';
+import DiffPlugin, { type DiffModelT } from '../src/index';
 import DB from './db';
 
-DB.init('mongodb://localhost:27017/testdb');
+DB.init();
 
 export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
   {
@@ -26,10 +26,11 @@ export class PostDoc /* :: extends Mongoose$Document */ {
   title: string;
   subjects: Array<{ name: string }>;
 
-  /* :: static diffModel(): any {} */
+  // TODO: find out solution for flow to use `DiffModelT` instead of `any`
+  /* :: static diffModel(): any {}  */
 }
 
-PostSchema.loadClass(PostDoc);
 PostSchema.plugin(DiffPlugin);
+PostSchema.loadClass(PostDoc);
 
 export const Post = DB.data.model('Post', PostSchema);
