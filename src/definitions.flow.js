@@ -4,7 +4,6 @@
 import type { ObjectId, MongooseModel } from 'mongoose';
 
 export type OptionsT = {|
-  // mongooseConnection: ?MongooseConnection,
   diffCollectionName: ?string,
 |};
 
@@ -29,10 +28,9 @@ export class ChangeDoc /* :: extends Mongoose$Document */ {
   kind: 'E' | 'N' | 'D' | 'A';
   lhs: any;
   rhs: any;
+  createdAt: Date;
   index: ?number;
   item: ?ItemDoc;
-  createdAt: ?Date;
-  updatedAt: ?Date;
 }
 
 export class DiffDoc /* :: extends Mongoose$Document */ {
@@ -42,22 +40,21 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
   path: Array<mixed>;
   changes: Array<ChangeDoc>;
 
-  // static async createDiff(docId: ObjectId, changes: Array<ChangeDoc>): Promise<DiffDoc> {
-  //   const doc = new this({ docId, changes });
-  //   return doc.save();
-  // }
-
   static async createOrUpdateDiffs(docId: ObjectId, changes: Array<RawChangeT>): Promise<void> {
     for (const change of changes) {
       let doc: DiffDoc;
-      const preparedChange: any = { ...change };
+      const preparedChange: any = { createdAt: new Date(), ...change };
       const path = preparedChange.path;
       delete preparedChange.path;
       doc = (await this.findOne({ path }).exec(): any);
       if (doc) {
-        doc.changes.push(preparedChange);
+        doc.changes = [preparedChange, ...doc.changes];
       } else {
-        doc = new this({ docId, path, changes: [preparedChange] });
+        doc = new this({
+          docId,
+          path,
+          changes: [preparedChange],
+        });
       }
       await doc.save();
     }
