@@ -36,7 +36,6 @@ describe('mongoose-dp', () => {
     expect(diffs[0].changes.length).toBe(2);
     expect(diffs[0].changes[0].kind).toBe('A');
     expect(diffs[0].changes[0].item.kind).toBe('N');
-    expect(diffs[0].changes[0].item.rhs.name).toBe('air');
   });
 
   it.skip('findOneAndUpdate', async () => {
