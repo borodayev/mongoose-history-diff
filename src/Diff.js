@@ -1,12 +1,15 @@
 // @flow
-/* eslint-disable no-await-in-loop */
 
-import { Schema, type ObjectId, type MongooseModel, type MongooseConnection } from 'mongoose';
+import { Schema, type MongooseConnection } from 'mongoose';
+import { ItemDoc, ChangeDoc, DiffDoc, type DiffModelT } from './definitions.flow';
 
 export default function(
   mongooseConnection: MongooseConnection,
   collectionName: string
-): MongooseModel {
+): DiffModelT {
+  if (!mongooseConnection) throw new Error(`'mongooseConection' is required`);
+  if (!collectionName) throw new Error(`'collectionName' is required`);
+
   const ItemSchema = new Schema(
     {
       kind: {
@@ -21,13 +24,6 @@ export default function(
       versionKey: false,
     }
   );
-
-  class ItemDoc /* :: extends Mongoose$Document */ {
-    kind: 'E' | 'N' | 'D' | 'A';
-    lhs: any;
-    rhs: any;
-  }
-
   ItemSchema.loadClass(ItemDoc);
 
   const ChangeSchema = new Schema(
@@ -47,62 +43,28 @@ export default function(
       timestamps: true,
     }
   );
-
-  class ChangeDoc /* :: extends Mongoose$Document */ {
-    kind: 'E' | 'N' | 'D' | 'A';
-    lhs: any;
-    rhs: any;
-    index: ?number;
-    item: ?ItemDoc;
-    createdAt: Date;
-    updatedAt: Date;
-  }
-
   ChangeSchema.loadClass(ChangeDoc);
 
   const DiffSchema = new Schema(
     {
       docId: Schema.Types.ObjectId,
-      path: [String],
+      path: [Schema.Types.Mixed],
       changes: [ChangeSchema],
     },
     { versionKey: false, timestamps: true, collection: collectionName }
   );
 
-  class DiffDoc /* :: extends Mongoose$Document */ {
-    // $FlowFixMe
-    _id: ObjectId;
-    docId: ObjectId;
-    path: Array<string>;
-    changes: Array<ChangeDoc>;
-
-    static async createOrUpdateDiffs(docId: ObjectId, changes: Array<Object>): Promise<void> {
-      for (const change of changes) {
-        let doc;
-        const path = change.path;
-        delete change.path;
-        doc = await this.findOne({ path }).exec();
-        if (doc) {
-          doc.changes.push(change);
-        } else {
-          doc = new this({ docId, path, changes: [change] });
-        }
-        await doc.save();
-      }
-    }
-
-    static async findAllByDocId(docId: ObjectId): Promise<Array<DiffDoc>> {
-      return this.find({ docId }).exec();
-    }
-  }
-
-  DiffSchema.index({ docId: 1 });
   DiffSchema.loadClass(DiffDoc);
+  DiffSchema.index({ docId: 1, path: 1 });
+
   const modelName: string = `${collectionName}_Model`;
+  let Model: DiffModelT;
 
   if (Object.keys(mongooseConnection.models).includes(modelName)) {
-    return (mongooseConnection.models[modelName]: any);
+    Model = (mongooseConnection.models[modelName]: any);
+  } else {
+    Model = mongooseConnection.model(modelName, DiffSchema);
   }
 
-  return mongooseConnection.model(modelName, DiffSchema);
+  return Model;
 }
