@@ -26,6 +26,21 @@ describe('utils', () => {
           path: 'undefined',
           options: { track_diff: true },
         },
+        array: {
+          path: 'array',
+          instance: 'Array',
+          options: {
+            type: [{ name: 'String' }],
+            track_diff: false,
+          },
+        },
+        arrayExcludeEmbedded: {
+          path: 'arrayExcludeEmbedded',
+          instance: 'Array',
+          options: {
+            type: [{ name: { track_diff: false } }],
+          },
+        },
       },
     };
 
@@ -34,6 +49,8 @@ describe('utils', () => {
       { key: 'title', lvl: 0 },
       { key: 'path', lvl: 1 },
       { key: 'pathLvl4', lvl: 4 },
+      { key: 'array', lvl: 0 },
+      { key: 'name', lvl: 2 },
     ]);
   });
 
@@ -42,14 +59,17 @@ describe('utils', () => {
       { key: 'title', lvl: 0 },
       { key: 'path', lvl: 1 },
       { key: 'pathLvl4', lvl: 4 },
+      { key: 'name', lvl: 2 },
     ];
 
     const isTitle = excludeFields([], 'title', exlFields);
     const isPath = excludeFields(['embedded'], 'path', exlFields);
     const isLvl4 = excludeFields(['embedded', 'a', 'b', 'c'], 'pathLvl4', exlFields);
+    const arrayExlEmbd = excludeFields(['arrayExcludeEmbedded', 0], 'name', exlFields);
 
     expect(isTitle).toBeTruthy();
     expect(isPath).toBeTruthy();
     expect(isLvl4).toBeTruthy();
+    expect(arrayExlEmbd).toBeTruthy();
   });
 });

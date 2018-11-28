@@ -19,7 +19,7 @@ describe('mongoose-dp', () => {
   it('save diffs', async () => {
     // need to return doc from db for invoking `init` hook,
     // because there is no sense to save initial doc in diffs
-    await Post.create({ title: 'test' });
+    await Post.create({ title: 'test', subjects: [{ name: 'matsdcsdch' }] });
     const post: PostDoc = (await Post.findOne({ title: 'test' }).exec(): any);
     post.title = 'updated';
     post.subjects = [{ name: 'math' }, { name: 'air' }];
@@ -29,13 +29,13 @@ describe('mongoose-dp', () => {
     const diffs = await Diff.findAllByDocId(post._id);
 
     expect(Array.isArray(diffs)).toBeTruthy();
-    expect(diffs[0].path[0]).toEqual('subjects');
-    expect(diffs[1].path[0]).toEqual('title');
+    expect(diffs[0].path.join('.')).toBe('subjects.0.name');
+    expect(diffs[1].path.join('.')).toBe('subjects');
+    expect(diffs[2].path.join('.')).toBe('title');
 
     expect(Array.isArray(diffs[0].changes)).toBeTruthy();
-    expect(diffs[0].changes.length).toBe(2);
-    expect(diffs[0].changes[0].kind).toBe('A');
-    expect(diffs[0].changes[0].item.kind).toBe('N');
+    expect(diffs[1].changes.length).toBe(1);
+    expect(diffs[0].changes[0].kind).toBe('E');
   });
 
   it.skip('findOneAndUpdate', async () => {
