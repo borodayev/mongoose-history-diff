@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign, func-names */
 
 import mongoose, { type MongooseSchema } from 'mongoose';
-import DiffPlugin, { type DiffModelT } from '../src/index';
+import DiffPlugin from '../src/index';
 import DB from './db';
 
 DB.init();
@@ -13,7 +13,12 @@ export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
       type: String,
       description: 'Provider who send Post',
     },
-    subjects: [{ name: String }],
+    subjects: [
+      {
+        _id: { track_diff: false },
+        name: { type: String, track_diff: false },
+      },
+    ],
   },
   {
     versionKey: false,

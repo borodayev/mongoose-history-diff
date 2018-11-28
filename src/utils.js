@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable camelcase */
 
 import type { MongooseSchema } from 'mongoose';
 
@@ -24,12 +25,24 @@ export const getExcludedFields = (schema: MongooseSchema<any>): Array<ExcludeFie
   const excludedFields: Array<ExcludeFieldT> = [];
   Object.values(schema.paths).forEach((value: any) => {
     const { options, path } = value || {};
-    // eslint-disable-next-line camelcase
+
     if (options?.track_diff === false) {
       const splittedPath = path.split('.');
       const lvl = splittedPath.length - 1;
       const key = splittedPath[lvl];
       excludedFields.push({ key, lvl });
+    } else if (value.instance === 'Array') {
+      value.options.type.forEach(obj => {
+        const aKey = Object.keys(obj)[0];
+        const aPath = [path, aKey].join('.');
+        const aOptions = obj[aKey];
+        if (aOptions?.track_diff === false) {
+          const splittedPath = aPath.split('.');
+          const lvl = splittedPath.length;
+          const key = splittedPath[lvl - 1];
+          excludedFields.push({ key, lvl });
+        }
+      });
     }
   });
   return excludedFields;
