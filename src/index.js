@@ -5,8 +5,11 @@ import deepDiff from 'deep-diff';
 import type { MongooseSchema } from 'mongoose';
 import type { DiffModelT, OptionsT } from './definitions.flow';
 import DiffModel from './Diff';
+import { getExcludedFields, excludeFields, type ExcludeFieldT } from './utils';
 
 export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) {
+  const excludedFields: Array<ExcludeFieldT> = getExcludedFields(schema);
+
   // $FlowFixMe
   schema.static('diffModel', function(): DiffModelT {
     const collectionName = options?.diffCollectionName || `${this.collection.name}_diff`;
@@ -25,10 +28,8 @@ export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) 
 
       const Diff: DiffModelT = this.constructor.diffModel();
 
-      const diffs = deepDiff.diff(
-        lhs,
-        rhs,
-        (path, key) => path.length === 0 && ['updatedAt', 'createdAt'].includes(key)
+      const diffs = deepDiff.diff(lhs, rhs, (path, key) =>
+        excludeFields(path, key, excludedFields)
       );
       if (diffs?.length > 0) await Diff.createOrUpdateDiffs(lhs._id, diffs);
       this._original = null;
