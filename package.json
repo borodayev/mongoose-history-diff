@@ -21,11 +21,8 @@
   },
   "homepage": "https://github.com/FrankAst/mongoose-dp",
   "license": "MIT",
-  "dependencies": {
-    "@babel/runtime": "^7.0.0",
-    "deep-diff": "^1.0.2",
-    "isomorphic-fetch": "^2.2.1",
-    "mongoose": "^5.0.4"
+  "peerDependencies": {
+    "mongoose": "^5.3.14"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
