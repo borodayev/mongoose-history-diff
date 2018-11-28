@@ -1,8 +1,8 @@
 // @flow
 /* eslint-disable no-param-reassign, func-names */
 
-import deepDiff from 'deep-diff';
 import type { MongooseSchema } from 'mongoose';
+import deepDiff from './deepDiff';
 import type { DiffModelT, OptionsT } from './definitions.flow';
 import DiffModel from './Diff';
 import { getExcludedFields, excludeFields, type ExcludeFieldT } from './utils';
