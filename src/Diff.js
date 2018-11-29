@@ -1,7 +1,7 @@
 // @flow
 
 import { Schema, type MongooseConnection } from 'mongoose';
-import { ItemDoc, ChangeDoc, DiffDoc, type DiffModelT } from './definitions.flow';
+import { ItemDoc, ChangeDoc, DiffDoc, type DiffModelT } from './definitions';
 
 export default function(
   mongooseConnection: MongooseConnection,
