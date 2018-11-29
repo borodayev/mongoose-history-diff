@@ -28,9 +28,7 @@ export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) 
 
       const Diff: DiffModelT = this.constructor.diffModel();
 
-      const diffs = deepDiff.diff(lhs, rhs, (path, key) =>
-        excludeFields(path, key, excludedFields)
-      );
+      const diffs = deepDiff(lhs, rhs, (path, key) => excludeFields(path, key, excludedFields));
       if (diffs?.length > 0) await Diff.createOrUpdateDiffs(lhs._id, diffs);
       this._original = null;
     }
