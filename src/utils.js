@@ -9,7 +9,7 @@ export type ExcludeFieldT = {|
 |};
 
 export const excludeFields = (
-  path: Array<mixed>,
+  path: Array<string>,
   key: string,
   excludedFields: Array<ExcludeFieldT>
 ): boolean => {

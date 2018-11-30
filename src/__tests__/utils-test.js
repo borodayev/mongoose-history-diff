@@ -65,7 +65,7 @@ describe('utils', () => {
     const isTitle = excludeFields([], 'title', exlFields);
     const isPath = excludeFields(['embedded'], 'path', exlFields);
     const isLvl4 = excludeFields(['embedded', 'a', 'b', 'c'], 'pathLvl4', exlFields);
-    const arrayExlEmbd = excludeFields(['arrayExcludeEmbedded', 0], 'name', exlFields);
+    const arrayExlEmbd = excludeFields(['arrayExcludeEmbedded', '0'], 'name', exlFields);
 
     expect(isTitle).toBeTruthy();
     expect(isPath).toBeTruthy();
