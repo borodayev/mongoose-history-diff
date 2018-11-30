@@ -45,7 +45,7 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-prettier": "^3.0.0",
     "fetch-mock": "^7.2.5",
-    "flow-bin": "^0.86.0",
+    "flow-bin": "^0.87.0",
     "jest": "23.6.0",
     "mongodb-memory-server": "^2.7.2",
     "nodemon": "^1.15.1",
