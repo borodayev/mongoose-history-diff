@@ -1,0 +1,120 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`findDiff object 1`] = `
+Array [
+  DiffNew {
+    "kind": "N",
+    "path": Array [
+      "obj",
+    ],
+    "rhs": Object {
+      "a": "ab",
+    },
+  },
+  DiffNew {
+    "kind": "N",
+    "path": Array [
+      "array",
+    ],
+    "rhs": Array [
+      "ab",
+    ],
+  },
+  DiffNew {
+    "kind": "N",
+    "path": Array [
+      "string",
+    ],
+    "rhs": "str1",
+  },
+  DiffNew {
+    "kind": "N",
+    "path": Array [
+      "newString",
+    ],
+    "rhs": "str2",
+  },
+  DiffNew {
+    "kind": "N",
+    "path": Array [
+      "number",
+    ],
+    "rhs": 1,
+  },
+  DiffNew {
+    "kind": "N",
+    "path": Array [
+      "date",
+    ],
+    "rhs": 2018-11-29T18:00:00.000Z,
+  },
+]
+`;
+
+exports[`findDiff object 2`] = `
+Array [
+  DiffEdit {
+    "kind": "E",
+    "path": Array [
+      "obj",
+      "a",
+    ],
+    "rhs": "ab",
+  },
+  DiffDeleted {
+    "kind": "D",
+    "lhs": "b",
+    "path": Array [
+      "obj",
+      "b",
+    ],
+  },
+  DiffArray {
+    "index": 1,
+    "item": DiffDeleted {
+      "kind": "D",
+      "lhs": "b",
+    },
+    "kind": "A",
+    "path": Array [
+      "array",
+    ],
+  },
+  DiffEdit {
+    "kind": "E",
+    "path": Array [
+      "array",
+      "0",
+    ],
+    "rhs": "ab",
+  },
+  DiffEdit {
+    "kind": "E",
+    "path": Array [
+      "string",
+    ],
+    "rhs": "str1",
+  },
+  DiffEdit {
+    "kind": "E",
+    "path": Array [
+      "number",
+    ],
+    "rhs": 1,
+  },
+  DiffEdit {
+    "kind": "E",
+    "path": Array [
+      "date",
+    ],
+    "rhs": 2018-11-29T18:00:00.000Z,
+  },
+  DiffNew {
+    "kind": "N",
+    "path": Array [
+      "newString",
+    ],
+    "rhs": "str2",
+  },
+]
+`;

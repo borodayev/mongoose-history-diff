@@ -12,9 +12,14 @@
   },
   "keywords": [
     "mongoose-diff",
+    "mongoose-diff-plugin",
     "mongoose-history",
-    "mongoose difference",
-    "mongoose-version"
+    "mongoose-difference",
+    "mongoose-version",
+    "mongoose diff",
+    "diff",
+    "differences",
+    "deep-diff"
   ],
   "bugs": {
     "url": "https://github.com/FrankAst/mongoose-dp/issues"

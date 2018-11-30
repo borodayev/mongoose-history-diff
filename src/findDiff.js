@@ -153,6 +153,8 @@ export const deepDiff = (
           changes.push(new DiffArray(currentPath, j, new DiffDeleted(undefined, lhs[j--])));
         }
 
+        // TODO: figure out how to track this case and save as a DiffArray
+        // instead of DiffEdit with path = ['array', '0', 'elementField'];
         while (i >= 0) {
           deepDiff(lhs[i], rhs[i], changes, {
             prefilter,
