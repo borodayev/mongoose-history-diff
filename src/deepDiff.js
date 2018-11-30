@@ -96,11 +96,11 @@ export const hashThisString = (str: string): number => {
 
 // Gets a hash of the given object in an array order-independent fashion
 // also object key order independent (easier since they can be alphabetized)
-export const getOrderIndependentHash = (object: Object) => {
+export const getOrderIndependentHash = (obj: Object) => {
   let accum = 0;
-  const type = realTypeOf(object);
+  const type = realTypeOf(obj);
   if (type === 'array') {
-    object.forEach(item => {
+    obj.forEach(item => {
       // Addition is commutative so this is order indep
       accum += getOrderIndependentHash(item);
     });
@@ -109,36 +109,43 @@ export const getOrderIndependentHash = (object: Object) => {
   }
 
   if (type === 'object') {
-    for (const key in object) {
-      if (object.hasOwnProperty(key)) {
-        const keyValueString = `[ type: object, key: ${key}, value hash: ${getOrderIndependentHash(
-          object[key]
-        )}]`;
-        accum += hashThisString(keyValueString);
-      }
-    }
+    Object.keys(obj).forEach(key => {
+      const keyValueString = `[ type: object, key: ${key}, value hash: ${getOrderIndependentHash(
+        obj[key]
+      )}]`;
+      accum += hashThisString(keyValueString);
+    });
     return accum;
   }
-
-  // Non object, non array...should be good?
-  const stringToHash = `[ type: ${type} ; value: ${object.toString()}]`;
+  const stringToHash = `[ type: ${type} ; value: ${obj.toString()}]`;
   return accum + hashThisString(stringToHash);
 };
+
+export type PrefilterT = (path: Array<string>, key: string) => boolean;
+
+export type StackT = {|
+  lhs: mixed,
+  rhs: mixed,
+|};
+
+export type DeepDiffOptsT = {|
+  prefilter: PrefilterT,
+  orderIndependent: boolean,
+  key?: string,
+  path?: Array<string>,
+  stack?: Array<StackT>,
+|};
 
 export const deepDiff = (
   lhs: any,
   rhs: any,
-  changes: any,
-  prefilter: Function,
-  path: Array<string> = [],
-  key: string,
-  stack: Array<any> = [],
-  orderIndependent: any
-): any => {
-  changes = changes || [];
-  path = path || [];
+  changes: Array<any> = [],
+  opts: DeepDiffOptsT
+): void => {
+  const { path, prefilter, key, orderIndependent } = opts || {};
+  let { stack } = opts || {};
   stack = stack || [];
-  const currentPath = path.slice(0);
+  const currentPath = path ? [...path] : [];
 
   if (key) {
     if (prefilter && prefilter(currentPath, key)) return;
@@ -151,22 +158,19 @@ export const deepDiff = (
     rhs = rhs.toString();
   }
 
-  const ltype = typeof lhs;
-  const rtype = typeof rhs;
   let i;
   let j;
-  let k;
   let other;
 
   const ldefined =
-    ltype !== 'undefined' ||
+    !!lhs ||
     (stack &&
       stack.length > 0 &&
       stack[stack.length - 1].lhs &&
       Object.getOwnPropertyDescriptor(stack[stack.length - 1].lhs, key));
 
   const rdefined =
-    rtype !== 'undefined' ||
+    !!rhs ||
     (stack &&
       stack.length > 0 &&
       stack[stack.length - 1].rhs &&
@@ -180,7 +184,7 @@ export const deepDiff = (
     changes.push(new DiffEdit(currentPath, lhs, rhs));
   } else if (realTypeOf(lhs) === 'date' && lhs - rhs !== 0) {
     changes.push(new DiffEdit(currentPath, lhs, rhs));
-  } else if (lhs && rhs && ltype === 'object') {
+  } else if (lhs && rhs && typeof lhs === 'object') {
     for (i = stack.length - 1; i > -1; --i) {
       if (stack[i].lhs === lhs) {
         other = true;
@@ -206,59 +210,58 @@ export const deepDiff = (
         while (i > j) {
           changes.push(new DiffArray(currentPath, i, new DiffNew(undefined, rhs[i--])));
         }
+
         while (j > i) {
           changes.push(new DiffArray(currentPath, j, new DiffDeleted(undefined, lhs[j--])));
         }
 
-        for (; i >= 0; --i) {
-          deepDiff(
-            lhs[i],
-            rhs[i],
-            changes,
+        while (i >= 0) {
+          deepDiff(lhs[i], rhs[i], changes, {
             prefilter,
-            currentPath,
-            i.toString(),
+            path: currentPath,
+            key: i.toString(),
             stack,
-            orderIndependent
-          );
+            orderIndependent,
+          });
+          --i;
         }
       } else {
-        const akeys = Object.keys(lhs);
-        const pkeys = Object.keys(rhs);
-        for (i = 0; i < akeys.length; ++i) {
-          k = akeys[i];
-          other = pkeys.indexOf(k);
+        const lhsKeys = Object.keys(lhs);
+        const rhsKeys = Object.keys(rhs);
+
+        lhsKeys.forEach(lhsKey => {
+          other = rhsKeys.indexOf(lhsKey);
           if (other >= 0) {
-            deepDiff(lhs[k], rhs[k], changes, prefilter, currentPath, k, stack, orderIndependent);
-            pkeys[other] = null;
+            deepDiff(lhs[lhsKey], rhs[lhsKey], changes, {
+              prefilter,
+              path: currentPath,
+              key: lhsKey,
+              stack,
+              orderIndependent,
+            });
+            rhsKeys[other] = null;
           } else {
-            deepDiff(
-              lhs[k],
-              undefined,
-              changes,
+            deepDiff(lhs[lhsKey], null, changes, {
               prefilter,
-              currentPath,
-              k,
+              path: currentPath,
+              key: lhsKey,
               stack,
-              orderIndependent
-            );
+              orderIndependent,
+            });
           }
-        }
-        for (i = 0; i < pkeys.length; ++i) {
-          k = pkeys[i];
-          if (k) {
-            deepDiff(
-              undefined,
-              rhs[k],
-              changes,
+        });
+
+        rhsKeys.forEach(rhsKey => {
+          if (rhsKey) {
+            deepDiff(null, rhs[rhsKey], changes, {
               prefilter,
-              currentPath,
-              k,
+              path: currentPath,
+              key: rhsKey,
               stack,
-              orderIndependent
-            );
+              orderIndependent,
+            });
           }
-        }
+        });
       }
       stack.length -= 1;
     } else if (lhs !== rhs) {
@@ -266,35 +269,42 @@ export const deepDiff = (
       changes.push(new DiffEdit(currentPath, lhs, rhs));
     }
   } else if (lhs !== rhs) {
-    if (!(ltype === 'number' && Number.isNaN(lhs) && Number.isNaN(rhs))) {
+    if (!(typeof lhs === 'number' && Number.isNaN(lhs) && Number.isNaN(rhs))) {
       changes.push(new DiffEdit(currentPath, lhs, rhs));
     }
   }
 };
 
-export const observableDiff = (lhs, rhs, observer, prefilter, orderIndependent) => {
+export const observableDiff = (
+  lhs: mixed,
+  rhs: mixed,
+  // TODO: ChangeT
+  observer: ((diff: any) => void) | null,
+  prefilter: PrefilterT,
+  orderIndependent: boolean
+): Array<any> => {
   const changes = [];
-  deepDiff(lhs, rhs, changes, prefilter, null, null, null, orderIndependent);
-  console.log(changes);
-
+  deepDiff(lhs, rhs, changes, { prefilter, orderIndependent });
   if (observer) {
-    for (let i = 0; i < changes.length; ++i) {
-      observer(changes[i]);
-    }
+    changes.forEach(change => {
+      // $FlowFixMe
+      observer(change);
+    });
   }
   return changes;
 };
 
-const accumulateDiff = (lhs, rhs, prefilter, accum): Array<any> => {
+const findDiff = (lhs: mixed, rhs: mixed, prefilter: PrefilterT, accum: any): Array<any> => {
   const observer = accum
     ? difference => {
         if (difference) {
+          if (!accum.push) throw new Error(`accum should have a 'push()' function`);
           accum.push(difference);
         }
       }
-    : undefined;
-  const changes = observableDiff(lhs, rhs, observer, prefilter);
-  return accum || (changes.length ? changes : undefined);
+    : null;
+  const changes = observableDiff(lhs, rhs, observer, prefilter, false);
+  return accum || changes;
 };
 
-export default accumulateDiff;
+export default findDiff;
