@@ -1,6 +1,12 @@
 // @flow
 
-import { getExcludedFields, excludeFields } from '../utils';
+import {
+  getExcludedFields,
+  excludeFields,
+  realTypeOf,
+  hashThisString,
+  getOrderIndependentHash,
+} from '../utils';
 
 describe('utils', () => {
   it('getExcludedFields()', () => {
@@ -71,5 +77,47 @@ describe('utils', () => {
     expect(isPath).toBeTruthy();
     expect(isLvl4).toBeTruthy();
     expect(arrayExlEmbd).toBeTruthy();
+  });
+
+  it('realTypeOf()', () => {
+    const date = realTypeOf(new Date());
+    const string = realTypeOf('str');
+    const number = realTypeOf(0);
+    const nullT = realTypeOf(null);
+    const undefinedT = realTypeOf(undefined);
+    const array = realTypeOf([]);
+    const obj = realTypeOf({});
+    const regx = realTypeOf(/i/);
+    const math = realTypeOf(Math);
+
+    expect(date).toBe('date');
+    expect(string).toBe('string');
+    expect(number).toBe('number');
+    expect(nullT).toBe('null');
+    expect(undefinedT).toBe('undefined');
+    expect(array).toBe('array');
+    expect(obj).toBe('object');
+    expect(regx).toBe('regexp');
+    expect(math).toBe('math');
+  });
+
+  it('hashThisString()', () => {
+    const hash1 = hashThisString('a');
+    const hash2 = hashThisString('abc');
+    const hash3 = hashThisString('abcsydghcsdagcyasjdcsdvcgsavdgcvsagdcbjhsdbbc');
+
+    expect(hash1).toBe(97);
+    expect(hash2).toBe(96354);
+    expect(hash3).toBe(25191889);
+  });
+
+  it('getOrderIndependentHash()', () => {
+    const array = getOrderIndependentHash(['a', 'b']);
+    const obj = getOrderIndependentHash({ a: 'a', b: 'b' });
+    const string = getOrderIndependentHash('ab');
+
+    expect(array).toBe(976844698);
+    expect(obj).toBe(-2385456289);
+    expect(string).toBe(35072500);
   });
 });
