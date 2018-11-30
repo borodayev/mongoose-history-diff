@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign, func-names */
 
 import type { MongooseSchema } from 'mongoose';
-import findDiff from './deepDiff';
+import findDiff from './findDiff';
 import type { DiffModelT, OptionsT } from './definitions';
 import DiffModel from './Diff';
 import { getExcludedFields, excludeFields, type ExcludeFieldT } from './utils';
