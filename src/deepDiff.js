@@ -1,7 +1,24 @@
 // @flow
-/* eslint-disable no-bitwise, no-param-reassign */
+/* eslint-disable no-param-reassign */
+
+import { realTypeOf, getOrderIndependentHash } from './utils';
 
 export type KindT = 'N' | 'E' | 'A' | 'D';
+
+export type PrefilterT = (path: Array<string>, key: string) => boolean;
+
+export type StackT = {|
+  lhs: mixed,
+  rhs: mixed,
+|};
+
+export type DeepDiffOptsT = {|
+  prefilter: PrefilterT,
+  orderIndependent: boolean,
+  key?: string,
+  path?: Array<string>,
+  stack?: Array<StackT>,
+|};
 
 class DiffEdit {
   kind: KindT;
@@ -56,85 +73,6 @@ class DiffArray {
     this.kind = 'A';
   }
 }
-
-export const realTypeOf = (obj: any): string => {
-  const type = typeof obj;
-  if (type !== 'object') {
-    return type;
-  }
-  if (obj === Math) {
-    return 'math';
-  }
-  if (obj === null) {
-    return 'null';
-  }
-  if (Array.isArray(obj)) {
-    return 'array';
-  }
-  if (Object.prototype.toString.call(obj) === '[object Date]') {
-    return 'date';
-  }
-  if (typeof obj.toString === 'function' && /^\/.*\//.test(obj.toString())) {
-    return 'regexp';
-  }
-  return 'object';
-};
-
-// http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
-export const hashThisString = (str: string): number => {
-  let hash = 0;
-  if (str.length === 0) {
-    return hash;
-  }
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash &= hash; // Convert to 32bit integer
-  }
-  return hash;
-};
-
-// Gets a hash of the given object in an array order-independent fashion
-// also object key order independent (easier since they can be alphabetized)
-export const getOrderIndependentHash = (obj: Object) => {
-  let accum = 0;
-  const type = realTypeOf(obj);
-  if (type === 'array') {
-    obj.forEach(item => {
-      // Addition is commutative so this is order indep
-      accum += getOrderIndependentHash(item);
-    });
-    const arrayString = `[type: array, hash: ${accum}]`;
-    return accum + hashThisString(arrayString);
-  }
-
-  if (type === 'object') {
-    Object.keys(obj).forEach(key => {
-      const keyValueString = `[ type: object, key: ${key}, value hash: ${getOrderIndependentHash(
-        obj[key]
-      )}]`;
-      accum += hashThisString(keyValueString);
-    });
-    return accum;
-  }
-  const stringToHash = `[ type: ${type} ; value: ${obj.toString()}]`;
-  return accum + hashThisString(stringToHash);
-};
-
-export type PrefilterT = (path: Array<string>, key: string) => boolean;
-
-export type StackT = {|
-  lhs: mixed,
-  rhs: mixed,
-|};
-
-export type DeepDiffOptsT = {|
-  prefilter: PrefilterT,
-  orderIndependent: boolean,
-  key?: string,
-  path?: Array<string>,
-  stack?: Array<StackT>,
-|};
 
 export const deepDiff = (
   lhs: any,
