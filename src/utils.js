@@ -16,7 +16,6 @@ export const excludeFields = (
   let isFilter = false;
   excludedFields.forEach(field => {
     if (path.length === field.lvl && key === field.key) isFilter = true;
-    if (path.length === 0 && ['updatedAt', 'createdAt', '_id'].includes(key)) isFilter = true;
   });
   return isFilter;
 };
