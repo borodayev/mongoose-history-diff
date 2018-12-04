@@ -27,7 +27,7 @@ describe('Diff', () => {
     // $FlowFixMe
     const docId = mongoose.Types.ObjectId();
     const changes = [
-      { kind: 'E', path: ['details', 'with', 2], lhs: 'elements', rhs: 'more' },
+      { kind: 'E', path: ['details', 'with', '2'], lhs: 'elements', rhs: 'more' },
       { kind: 'A', path: ['details', 'with'], index: 3, item: { kind: 'N', rhs: 'elements' } },
     ];
 

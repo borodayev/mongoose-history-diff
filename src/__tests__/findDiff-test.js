@@ -25,10 +25,32 @@ describe('findDiff', () => {
     const itself = findDiff(lhs, lhs);
     const edited = findDiff({ a: 1 }, { a: 2 });
 
-    expect(newDiffs).toMatchSnapshot();
-    expect(modifiedDiffs).toMatchSnapshot();
+    expect(newDiffs).toEqual([
+      { kind: 'N', path: ['obj'], rhs: { a: 'ab' } },
+      { kind: 'N', path: ['array'], rhs: ['ab'] },
+      { kind: 'N', path: ['string'], rhs: 'str1' },
+      { kind: 'N', path: ['newString'], rhs: 'str2' },
+      { kind: 'N', path: ['number'], rhs: 1 },
+      { kind: 'N', path: ['date'], rhs: new Date('2018-11-29T18:00:00.000Z') },
+    ]);
+
+    expect(modifiedDiffs).toEqual([
+      { kind: 'E', lhs: 'a', path: ['obj', 'a'], rhs: 'ab' },
+      { kind: 'D', lhs: 'b', path: ['obj', 'b'] },
+      { index: 1, item: { kind: 'D', lhs: 'b' }, kind: 'A', path: ['array'] },
+      { kind: 'E', lhs: 'a', path: ['array', '0'], rhs: 'ab' },
+      { kind: 'E', lhs: 'str', path: ['string'], rhs: 'str1' },
+      { kind: 'E', lhs: 0, path: ['number'], rhs: 1 },
+      {
+        kind: 'E',
+        lhs: new Date('2018-12-29T18:00:00.000Z'),
+        path: ['date'],
+        rhs: new Date('2018-11-29T18:00:00.000Z'),
+      },
+      { kind: 'N', path: ['newString'], rhs: 'str2' },
+    ]);
+    expect(edited).toEqual([{ kind: 'E', lhs: 1, path: ['a'], rhs: 2 }]);
     expect(itself).toEqual([]);
-    expect(edited).toMatchSnapshot();
   });
 
   it('array', () => {
@@ -41,11 +63,21 @@ describe('findDiff', () => {
     const orderIndependent = findDiff([1, 2, 3], [1, 3, 2], true);
     const orderDepended = findDiff([1, 2, 3], [1, 3, 2], false);
 
-    expect(newDiffs).toMatchSnapshot();
-    expect(modifiedDiffs).toMatchSnapshot();
-    expect(itself).toEqual([]);
+    expect(newDiffs).toEqual([
+      { index: 1, item: { kind: 'N', rhs: { b: 1 } }, kind: 'A', path: [] },
+      { index: 0, item: { kind: 'N', rhs: 'a' }, kind: 'A', path: [] },
+    ]);
+    expect(modifiedDiffs).toEqual([
+      { kind: 'E', lhs: 1, path: ['1', 'b'], rhs: 12 },
+      { kind: 'N', path: ['1', 'd'], rhs: ['sd', 'sq'] },
+      { kind: 'E', lhs: 'a', path: ['0'], rhs: 'ab' },
+    ]);
+    expect(orderDepended).toEqual([
+      { kind: 'E', lhs: 3, path: ['2'], rhs: 2 },
+      { kind: 'E', lhs: 2, path: ['1'], rhs: 3 },
+    ]);
     expect(orderIndependent).toEqual([]);
-    expect(orderDepended).toMatchSnapshot();
+    expect(itself).toEqual([]);
   });
 
   it('prefilter', () => {
@@ -66,6 +98,10 @@ describe('findDiff', () => {
     };
 
     const diffs = findDiff(lhs, rhs, false, (path, key) => ['obj', 'array', 'date'].includes(key));
-    expect(diffs).toMatchSnapshot();
+    expect(diffs).toEqual([
+      { kind: 'E', lhs: 'str', path: ['string'], rhs: 'str1' },
+      { kind: 'E', lhs: 0, path: ['number'], rhs: 1 },
+      { kind: 'N', path: ['newString'], rhs: 'str2' },
+    ]);
   });
 });
