@@ -1,5 +1,84 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`findDiff array 1`] = `
+Array [
+  DiffArray {
+    "index": 1,
+    "item": DiffNew {
+      "kind": "N",
+      "rhs": Object {
+        "b": 1,
+      },
+    },
+    "kind": "A",
+    "path": Array [],
+  },
+  DiffArray {
+    "index": 0,
+    "item": DiffNew {
+      "kind": "N",
+      "rhs": "a",
+    },
+    "kind": "A",
+    "path": Array [],
+  },
+]
+`;
+
+exports[`findDiff array 2`] = `
+Array [
+  DiffEdit {
+    "kind": "E",
+    "lhs": 1,
+    "path": Array [
+      "1",
+      "b",
+    ],
+    "rhs": 12,
+  },
+  DiffNew {
+    "kind": "N",
+    "path": Array [
+      "1",
+      "d",
+    ],
+    "rhs": Array [
+      "sd",
+      "sq",
+    ],
+  },
+  DiffEdit {
+    "kind": "E",
+    "lhs": "a",
+    "path": Array [
+      "0",
+    ],
+    "rhs": "ab",
+  },
+]
+`;
+
+exports[`findDiff array 3`] = `
+Array [
+  DiffEdit {
+    "kind": "E",
+    "lhs": 3,
+    "path": Array [
+      "2",
+    ],
+    "rhs": 2,
+  },
+  DiffEdit {
+    "kind": "E",
+    "lhs": 2,
+    "path": Array [
+      "1",
+    ],
+    "rhs": 3,
+  },
+]
+`;
+
 exports[`findDiff object 1`] = `
 Array [
   DiffNew {
@@ -55,6 +134,7 @@ exports[`findDiff object 2`] = `
 Array [
   DiffEdit {
     "kind": "E",
+    "lhs": "a",
     "path": Array [
       "obj",
       "a",
@@ -82,6 +162,7 @@ Array [
   },
   DiffEdit {
     "kind": "E",
+    "lhs": "a",
     "path": Array [
       "array",
       "0",
@@ -90,6 +171,7 @@ Array [
   },
   DiffEdit {
     "kind": "E",
+    "lhs": "str",
     "path": Array [
       "string",
     ],
@@ -97,6 +179,7 @@ Array [
   },
   DiffEdit {
     "kind": "E",
+    "lhs": 0,
     "path": Array [
       "number",
     ],
@@ -104,10 +187,52 @@ Array [
   },
   DiffEdit {
     "kind": "E",
+    "lhs": 2018-12-29T18:00:00.000Z,
     "path": Array [
       "date",
     ],
     "rhs": 2018-11-29T18:00:00.000Z,
+  },
+  DiffNew {
+    "kind": "N",
+    "path": Array [
+      "newString",
+    ],
+    "rhs": "str2",
+  },
+]
+`;
+
+exports[`findDiff object 3`] = `
+Array [
+  DiffEdit {
+    "kind": "E",
+    "lhs": 1,
+    "path": Array [
+      "a",
+    ],
+    "rhs": 2,
+  },
+]
+`;
+
+exports[`findDiff prefilter 1`] = `
+Array [
+  DiffEdit {
+    "kind": "E",
+    "lhs": "str",
+    "path": Array [
+      "string",
+    ],
+    "rhs": "str1",
+  },
+  DiffEdit {
+    "kind": "E",
+    "lhs": 0,
+    "path": Array [
+      "number",
+    ],
+    "rhs": 1,
   },
   DiffNew {
     "kind": "N",
