@@ -9,9 +9,11 @@ export type OptionsT = {|
 
 export type DiffModelT = MongooseModel & typeof DiffDoc;
 
+export type KindT = 'N' | 'E' | 'A' | 'D';
+
 export type RawChangeT = {|
-  kind: 'E' | 'N' | 'D' | 'A',
-  path: Array<mixed>,
+  kind: KindT,
+  path: Array<string>,
   lhs?: any,
   rhs?: any,
   index?: number,
@@ -19,13 +21,13 @@ export type RawChangeT = {|
 |};
 
 export class ItemDoc /* :: extends Mongoose$Document */ {
-  kind: 'E' | 'N' | 'D' | 'A';
+  kind: KindT;
   lhs: any;
   rhs: any;
 }
 
 export class ChangeDoc /* :: extends Mongoose$Document */ {
-  kind: 'E' | 'N' | 'D' | 'A';
+  kind: KindT;
   lhs: any;
   rhs: any;
   createdAt: Date;

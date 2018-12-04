@@ -89,7 +89,7 @@ export const hashThisString = (str: string): number => {
 // also object key order independent (easier since they can be alphabetized)
 
 // Object | Array<any> | string
-export const getOrderIndependentHash = (obj: any) => {
+export const getOrderIndependentHash = (obj: any): number => {
   let accum = 0;
   const type = realTypeOf(obj);
   if (type === 'array') {
