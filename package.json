@@ -42,6 +42,7 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.4.2",
+    "babel-preset-minify": "^0.5.0",
     "cz-conventional-changelog": "^2.1.0",
     "eslint": "^5.0.0",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -76,8 +77,8 @@
     ]
   },
   "scripts": {
-    "build": "npm run build-cjs && npm run build-flow",
-    "build-cjs": "rimraf lib && babel src --ignore __tests__,__mocks__,__fixtures__ -d lib",
+    "build": "npm run build-cjs",
+    "build-cjs": "rimraf lib && ./node_modules/.bin/babel src -d lib --ignore './src/__tests__'",
     "build-flow": "find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
     "watch": "jest --watch",
     "coverage": "jest --coverage --maxWorkers 2",
