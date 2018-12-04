@@ -2,8 +2,7 @@
 /* eslint-disable no-param-reassign */
 
 import { realTypeOf, getOrderIndependentHash } from './utils';
-
-export type KindT = 'N' | 'E' | 'A' | 'D';
+import type { RawChangeT } from './definitions';
 
 export type PrefilterT = (path: Array<string>, key: string) => boolean;
 
@@ -20,66 +19,10 @@ export type DeepDiffOptsT = {|
   stack?: Array<StackT>,
 |};
 
-export type DeepDiffChangeT = DiffEdit | DiffNew | DiffDeleted | DiffArray;
-
-class DiffEdit {
-  kind: KindT;
-  path: any;
-  lhs: any;
-  rhs: any;
-
-  constructor(path: any, lhs: any, rhs: any) {
-    this.path = path;
-    this.lhs = lhs;
-    this.rhs = rhs;
-    this.kind = 'E';
-  }
-}
-
-class DiffNew {
-  kind: KindT;
-  path: any;
-  rhs: any;
-
-  constructor(path: any, rhs: any) {
-    this.path = path;
-    this.rhs = rhs;
-    this.kind = 'N';
-    if (!this.path) delete this.path;
-  }
-}
-
-class DiffDeleted {
-  kind: KindT;
-  path: any;
-  lhs: any;
-
-  constructor(path: any, lhs: any) {
-    this.path = path;
-    this.lhs = lhs;
-    this.kind = 'D';
-    if (!this.path) delete this.path;
-  }
-}
-
-class DiffArray {
-  kind: KindT;
-  path: any;
-  index: any;
-  item: any;
-
-  constructor(path: any, index: any, item: any) {
-    this.path = path;
-    this.index = index;
-    this.item = item;
-    this.kind = 'A';
-  }
-}
-
 export const deepDiff = (
   lhs: any,
   rhs: any,
-  changes: Array<DeepDiffChangeT> = [],
+  changes: Array<RawChangeT> = [],
   opts: DeepDiffOptsT
 ): void => {
   const { path, prefilter, key, orderIndependent } = opts || {};
@@ -92,7 +35,6 @@ export const deepDiff = (
     currentPath.push(key);
   }
 
-  // Use string comparison for regexes
   if (realTypeOf(lhs) === 'regexp' && realTypeOf(rhs) === 'regexp') {
     lhs = lhs.toString();
     rhs = rhs.toString();
@@ -117,13 +59,13 @@ export const deepDiff = (
       Object.getOwnPropertyDescriptor(stack[stack.length - 1].rhs, key));
 
   if (!ldefined && rdefined) {
-    changes.push(new DiffNew(currentPath, rhs));
+    changes.push({ kind: 'N', path: currentPath, rhs });
   } else if (!rdefined && ldefined) {
-    changes.push(new DiffDeleted(currentPath, lhs));
+    changes.push({ kind: 'D', path: currentPath, lhs });
   } else if (realTypeOf(lhs) !== realTypeOf(rhs)) {
-    changes.push(new DiffEdit(currentPath, lhs, rhs));
+    changes.push({ kind: 'E', path: currentPath, lhs, rhs });
   } else if (realTypeOf(lhs) === 'date' && lhs - rhs !== 0) {
-    changes.push(new DiffEdit(currentPath, lhs, rhs));
+    changes.push({ kind: 'E', path: currentPath, lhs, rhs });
   } else if (lhs && rhs && typeof lhs === 'object') {
     for (i = stack.length - 1; i > -1; --i) {
       if (stack[i].lhs === lhs) {
@@ -148,11 +90,21 @@ export const deepDiff = (
         j = lhs.length - 1;
 
         while (i > j) {
-          changes.push(new DiffArray(currentPath, i, new DiffNew(undefined, rhs[i--])));
+          changes.push({
+            kind: 'A',
+            path: currentPath,
+            index: i,
+            item: { kind: 'N', rhs: rhs[i--] },
+          });
         }
 
         while (j > i) {
-          changes.push(new DiffArray(currentPath, j, new DiffDeleted(undefined, lhs[j--])));
+          changes.push({
+            kind: 'A',
+            path: currentPath,
+            index: j,
+            item: { kind: 'D', lhs: lhs[j--] },
+          });
         }
 
         // TODO: figure out how to track this case and save as a DiffArray
@@ -208,11 +160,11 @@ export const deepDiff = (
       stack.length -= 1;
     } else if (lhs !== rhs) {
       // lhs is contains a cycle at this element and it differs from rhs
-      changes.push(new DiffEdit(currentPath, lhs, rhs));
+      changes.push({ kind: 'E', path: currentPath, lhs, rhs });
     }
   } else if (lhs !== rhs) {
     if (!(typeof lhs === 'number' && Number.isNaN(lhs) && Number.isNaN(rhs))) {
-      changes.push(new DiffEdit(currentPath, lhs, rhs));
+      changes.push({ kind: 'E', path: currentPath, lhs, rhs });
     }
   }
 };
@@ -220,11 +172,11 @@ export const deepDiff = (
 export const observableDiff = (
   lhs: mixed,
   rhs: mixed,
-  observer: ((diff: DeepDiffChangeT) => void) | null,
+  observer: ((diff: RawChangeT) => void) | null,
   prefilter: PrefilterT,
   orderIndependent: boolean
-): Array<DeepDiffChangeT> => {
-  const changes: Array<DeepDiffChangeT> = [];
+): Array<RawChangeT> => {
+  const changes = [];
   deepDiff(lhs, rhs, changes, { prefilter, orderIndependent });
   if (observer) {
     changes.forEach(change => {
@@ -241,7 +193,7 @@ const findDiff = (
   orderIndependent: boolean,
   prefilter: PrefilterT,
   accum: any
-): Array<DeepDiffChangeT> => {
+): Array<RawChangeT> => {
   const observer = accum
     ? difference => {
         if (difference) {
