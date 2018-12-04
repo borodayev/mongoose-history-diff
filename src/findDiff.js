@@ -20,6 +20,8 @@ export type DeepDiffOptsT = {|
   stack?: Array<StackT>,
 |};
 
+export type DeepDiffChangeT = DiffEdit | DiffNew | DiffDeleted | DiffArray;
+
 class DiffEdit {
   kind: KindT;
   path: any;
@@ -28,7 +30,7 @@ class DiffEdit {
 
   constructor(path: any, lhs: any, rhs: any) {
     this.path = path;
-    this.rhs = rhs;
+    this.lhs = lhs;
     this.rhs = rhs;
     this.kind = 'E';
   }
@@ -77,7 +79,7 @@ class DiffArray {
 export const deepDiff = (
   lhs: any,
   rhs: any,
-  changes: Array<any> = [],
+  changes: Array<DeepDiffChangeT> = [],
   opts: DeepDiffOptsT
 ): void => {
   const { path, prefilter, key, orderIndependent } = opts || {};
@@ -218,12 +220,11 @@ export const deepDiff = (
 export const observableDiff = (
   lhs: mixed,
   rhs: mixed,
-  // TODO: ChangeT
-  observer: ((diff: any) => void) | null,
+  observer: ((diff: DeepDiffChangeT) => void) | null,
   prefilter: PrefilterT,
   orderIndependent: boolean
-): Array<any> => {
-  const changes = [];
+): Array<DeepDiffChangeT> => {
+  const changes: Array<DeepDiffChangeT> = [];
   deepDiff(lhs, rhs, changes, { prefilter, orderIndependent });
   if (observer) {
     changes.forEach(change => {
@@ -234,7 +235,13 @@ export const observableDiff = (
   return changes;
 };
 
-const findDiff = (lhs: mixed, rhs: mixed, prefilter: PrefilterT, accum: any): Array<any> => {
+const findDiff = (
+  lhs: mixed,
+  rhs: mixed,
+  orderIndependent: boolean,
+  prefilter: PrefilterT,
+  accum: any
+): Array<DeepDiffChangeT> => {
   const observer = accum
     ? difference => {
         if (difference) {
@@ -243,7 +250,8 @@ const findDiff = (lhs: mixed, rhs: mixed, prefilter: PrefilterT, accum: any): Ar
         }
       }
     : null;
-  const changes = observableDiff(lhs, rhs, observer, prefilter, false);
+  const changes = observableDiff(lhs, rhs, observer, prefilter, orderIndependent);
+
   return accum || changes;
 };
 

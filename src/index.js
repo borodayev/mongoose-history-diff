@@ -3,7 +3,7 @@
 
 import type { MongooseSchema } from 'mongoose';
 import findDiff from './findDiff';
-import type { DiffModelT, OptionsT } from './definitions';
+import type { DiffModelT, OptionsT, RawChangeT } from './definitions';
 import DiffModel from './Diff';
 import { getExcludedFields, excludeFields, type ExcludeFieldT } from './utils';
 
@@ -28,7 +28,10 @@ export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) 
 
       const Diff: DiffModelT = this.constructor.diffModel();
 
-      const diffs = findDiff(lhs, rhs, (path, key) => excludeFields(path, key, excludedFields));
+      const diffs: Array<RawChangeT> = (findDiff(lhs, rhs, false, (path, key) =>
+        excludeFields(path, key, excludedFields)
+      ): any);
+
       if (diffs?.length > 0) await Diff.createOrUpdateDiffs(lhs._id, diffs);
       this._original = null;
     }
