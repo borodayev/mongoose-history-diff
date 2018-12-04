@@ -1,6 +1,7 @@
   const presets = [
     require.resolve('@babel/preset-env'),
     require.resolve('@babel/preset-flow'),
+    require.resolve('babel-preset-minify'),
   ];
 
   const plugins = [
