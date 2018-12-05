@@ -5,6 +5,7 @@ import type { ObjectId, MongooseModel } from 'mongoose';
 
 export type OptionsT = {|
   diffCollectionName: ?string,
+  orderIndepended: ?boolean,
 |};
 
 export type DiffModelT = MongooseModel & typeof DiffDoc;

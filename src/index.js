@@ -27,8 +27,8 @@ export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) 
       const rhs = this.toObject();
 
       const Diff: DiffModelT = this.constructor.diffModel();
-
-      const diffs: Array<RawChangeT> = (findDiff(lhs, rhs, false, (path, key) =>
+      const orderIndep = options?.orderIndepended || false;
+      const diffs: Array<RawChangeT> = (findDiff(lhs, rhs, orderIndep, (path, key) =>
         excludeFields(path, key, excludedFields)
       ): any);
 
