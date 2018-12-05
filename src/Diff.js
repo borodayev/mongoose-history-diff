@@ -12,12 +12,12 @@ export default function(
 
   const ItemSchema = new Schema(
     {
-      kind: {
+      k: {
         type: String,
         enum: ['E', 'N', 'D', 'A'],
       },
-      lhs: Schema.Types.Mixed,
-      rhs: Schema.Types.Mixed,
+      l: Schema.Types.Mixed,
+      r: Schema.Types.Mixed,
     },
     {
       _id: false,
@@ -28,28 +28,29 @@ export default function(
 
   const ChangeSchema = new Schema(
     {
-      kind: {
+      k: {
         type: String,
         enum: ['E', 'N', 'D', 'A'],
       },
-      lhs: Schema.Types.Mixed,
-      rhs: Schema.Types.Mixed,
-      index: Number,
-      item: ItemSchema,
+      p: [String],
+      l: Schema.Types.Mixed,
+      r: Schema.Types.Mixed,
+      i: Number,
+      it: ItemSchema,
     },
     {
       _id: false,
       versionKey: false,
-      timestamps: true,
     }
   );
+
   ChangeSchema.loadClass(ChangeDoc);
 
   const DiffSchema = new Schema(
     {
-      docId: Schema.Types.ObjectId,
-      path: [Schema.Types.Mixed],
-      changes: [ChangeSchema],
+      dId: Schema.Types.ObjectId,
+      c: [ChangeSchema],
+      v: Number,
     },
     { versionKey: false, timestamps: true, collection: collectionName }
   );

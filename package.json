@@ -12,9 +12,14 @@
   },
   "keywords": [
     "mongoose-diff",
+    "mongoose-diff-plugin",
     "mongoose-history",
-    "mongoose difference",
-    "mongoose-version"
+    "mongoose-difference",
+    "mongoose-version",
+    "mongoose diff",
+    "diff",
+    "differences",
+    "deep-diff"
   ],
   "bugs": {
     "url": "https://github.com/FrankAst/mongoose-dp/issues"
@@ -37,6 +42,7 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.4.2",
+    "babel-preset-minify": "^0.5.0",
     "cz-conventional-changelog": "^2.1.0",
     "eslint": "^5.0.0",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -45,7 +51,7 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-prettier": "^3.0.0",
     "fetch-mock": "^7.2.5",
-    "flow-bin": "^0.86.0",
+    "flow-bin": "^0.87.0",
     "jest": "23.6.0",
     "mongodb-memory-server": "^2.7.2",
     "nodemon": "^1.15.1",
@@ -71,8 +77,8 @@
     ]
   },
   "scripts": {
-    "build": "npm run build-cjs && npm run build-flow",
-    "build-cjs": "rimraf lib && babel src --ignore __tests__,__mocks__,__fixtures__ -d lib",
+    "build": "npm run build-cjs",
+    "build-cjs": "rimraf lib && ./node_modules/.bin/babel src -d lib --ignore './src/__tests__'",
     "build-flow": "find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
     "watch": "jest --watch",
     "coverage": "jest --coverage --maxWorkers 2",

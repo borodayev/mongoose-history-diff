@@ -2,8 +2,8 @@
 /* eslint-disable no-param-reassign, func-names */
 
 import type { MongooseSchema } from 'mongoose';
-import deepDiff from './deepDiff';
-import type { DiffModelT, OptionsT } from './definitions';
+import findDiff from './findDiff';
+import type { DiffModelT, OptionsT, RawChangeT } from './definitions';
 import DiffModel from './Diff';
 import { getExcludedFields, excludeFields, type ExcludeFieldT } from './utils';
 
@@ -27,11 +27,12 @@ export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) 
       const rhs = this.toObject();
 
       const Diff: DiffModelT = this.constructor.diffModel();
-
-      const diffs = deepDiff.diff(lhs, rhs, (path, key) =>
+      const orderIndep = options?.orderIndepended || false;
+      const diffs: Array<RawChangeT> = (findDiff(lhs, rhs, orderIndep, (path, key) =>
         excludeFields(path, key, excludedFields)
-      );
-      if (diffs?.length > 0) await Diff.createOrUpdateDiffs(lhs._id, diffs);
+      ): any);
+
+      if (diffs?.length > 0) await Diff.createDiff(lhs._id, diffs);
       this._original = null;
     }
   });
