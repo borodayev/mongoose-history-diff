@@ -32,7 +32,7 @@ export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) 
         excludeFields(path, key, excludedFields)
       ): any);
 
-      if (diffs?.length > 0) await Diff.createOrUpdateDiffs(lhs._id, diffs);
+      if (diffs?.length > 0) await Diff.createDiff(lhs._id, diffs);
       this._original = null;
     }
   });
