@@ -59,13 +59,13 @@ export const deepDiff = (
       Object.getOwnPropertyDescriptor(stack[stack.length - 1].rhs, key));
 
   if (!ldefined && rdefined) {
-    changes.push({ kind: 'N', path: currentPath, rhs });
+    changes.push({ k: 'N', p: currentPath, r: rhs });
   } else if (!rdefined && ldefined) {
-    changes.push({ kind: 'D', path: currentPath, lhs });
+    changes.push({ k: 'D', p: currentPath, l: lhs });
   } else if (realTypeOf(lhs) !== realTypeOf(rhs)) {
-    changes.push({ kind: 'E', path: currentPath, lhs, rhs });
+    changes.push({ k: 'E', p: currentPath, l: lhs, r: rhs });
   } else if (realTypeOf(lhs) === 'date' && lhs - rhs !== 0) {
-    changes.push({ kind: 'E', path: currentPath, lhs, rhs });
+    changes.push({ k: 'E', p: currentPath, l: lhs, r: rhs });
   } else if (lhs && rhs && typeof lhs === 'object') {
     for (i = stack.length - 1; i > -1; --i) {
       if (stack[i].lhs === lhs) {
@@ -91,19 +91,19 @@ export const deepDiff = (
 
         while (i > j) {
           changes.push({
-            kind: 'A',
-            path: currentPath,
-            index: i,
-            item: { kind: 'N', rhs: rhs[i--] },
+            k: 'A',
+            p: currentPath,
+            i,
+            it: { k: 'N', r: rhs[i--] },
           });
         }
 
         while (j > i) {
           changes.push({
-            kind: 'A',
-            path: currentPath,
-            index: j,
-            item: { kind: 'D', lhs: lhs[j--] },
+            k: 'A',
+            p: currentPath,
+            i: j,
+            it: { k: 'D', l: lhs[j--] },
           });
         }
 
@@ -113,7 +113,7 @@ export const deepDiff = (
           deepDiff(lhs[i], rhs[i], changes, {
             prefilter,
             path: currentPath,
-            key: i.toString(),
+            key: i.toString(), // try to pass key as a number to define array element in the next iteration
             stack,
             orderIndependent,
           });
@@ -160,11 +160,11 @@ export const deepDiff = (
       stack.length -= 1;
     } else if (lhs !== rhs) {
       // lhs is contains a cycle at this element and it differs from rhs
-      changes.push({ kind: 'E', path: currentPath, lhs, rhs });
+      changes.push({ k: 'E', p: currentPath, l: lhs, r: rhs });
     }
   } else if (lhs !== rhs) {
     if (!(typeof lhs === 'number' && Number.isNaN(lhs) && Number.isNaN(rhs))) {
-      changes.push({ kind: 'E', path: currentPath, lhs, rhs });
+      changes.push({ k: 'E', p: currentPath, l: lhs, r: rhs });
     }
   }
 };
