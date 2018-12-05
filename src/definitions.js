@@ -9,60 +9,55 @@ export type OptionsT = {|
 
 export type DiffModelT = MongooseModel & typeof DiffDoc;
 
-export type KindT = 'N' | 'E' | 'A' | 'D';
+export type KindT = 'E' | 'N' | 'D' | 'A';
 
 export type RawChangeT = {|
-  kind: KindT,
-  path: Array<string>,
-  lhs?: any,
-  rhs?: any,
-  index?: number,
-  item?: $Shape<ItemDoc>,
+  k: KindT,
+  p: Array<string>,
+  l?: any,
+  r?: any,
+  i?: number,
+  it?: $Shape<ItemDoc>,
 |};
 
 export class ItemDoc /* :: extends Mongoose$Document */ {
-  kind: KindT;
-  lhs: any;
-  rhs: any;
+  k: KindT;
+  l: ?any;
+  r: ?any;
 }
 
 export class ChangeDoc /* :: extends Mongoose$Document */ {
-  kind: KindT;
-  lhs: any;
-  rhs: any;
-  createdAt: Date;
-  index: ?number;
-  item: ?ItemDoc;
+  k: KindT;
+  p: Array<string>;
+  l: ?any;
+  r: ?any;
+  i: ?number;
+  it: ?ItemDoc;
 }
 
 export class DiffDoc /* :: extends Mongoose$Document */ {
   // $FlowFixMe
   _id: ObjectId;
-  docId: ObjectId;
-  path: Array<mixed>;
-  changes: Array<ChangeDoc>;
+  dId: ObjectId;
+  c: Array<ChangeDoc>;
+  v: number;
 
-  static async createOrUpdateDiffs(docId: ObjectId, changes: Array<RawChangeT>): Promise<void> {
-    for (const change of changes) {
-      let doc: DiffDoc;
-      const preparedChange: any = { createdAt: new Date(), ...change };
-      const path = preparedChange.path;
-      delete preparedChange.path;
-      doc = (await this.findOne({ path }).exec(): any);
-      if (doc) {
-        doc.changes = [preparedChange, ...doc.changes];
-      } else {
-        doc = new this({
-          docId,
-          path,
-          changes: [preparedChange],
-        });
-      }
-      await doc.save();
-    }
+  static async createDiff(docId: ObjectId, changes: Array<RawChangeT>): Promise<DiffDoc> {
+    const v = await this.getNextVersion(docId);
+    const doc = new this({ dId: docId, c: (changes: any), v });
+    return doc.save();
+  }
+
+  static async getNextVersion(docId: ObjectId): Promise<number> {
+    const doc = await this.find({ dId: docId }, { v: 1, _id: 0 })
+      .sort({ v: -1 })
+      .limit(1);
+
+    if (doc?.length > 0) return doc[0].v + 1;
+    return 1;
   }
 
   static async findAllByDocId(docId: ObjectId): Promise<Array<DiffDoc>> {
-    return this.find({ docId }).exec();
+    return this.find({ dId: docId }).exec();
   }
 }
