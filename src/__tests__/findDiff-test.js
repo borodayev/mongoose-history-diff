@@ -61,6 +61,11 @@ describe('findDiff', () => {
     const modifiedDiffs = findDiff(lhs, rhs);
     const itself = findDiff(lhs, lhs);
     const orderIndependent = findDiff([1, 2, 3], [1, 3, 2], true);
+    const orderIndependentObj = findDiff(
+      [{ a: 1 }, { a: 2, b: 3 }],
+      [{ a: 2, b: 3 }, { a: 1 }],
+      true
+    );
     const orderDepended = findDiff([1, 2, 3], [1, 3, 2], false);
 
     expect(newDiffs).toEqual([
@@ -77,6 +82,7 @@ describe('findDiff', () => {
       { k: 'E', l: 2, p: ['1'], r: 3 },
     ]);
     expect(orderIndependent).toEqual([]);
+    expect(orderIndependentObj).toEqual([]);
     expect(itself).toEqual([]);
   });
 
