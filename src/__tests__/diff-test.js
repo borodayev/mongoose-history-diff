@@ -26,20 +26,57 @@ describe('Diff', () => {
     const Diff = DiffModel(DB.data, 'diffs');
     // $FlowFixMe
     const docId = mongoose.Types.ObjectId();
-    const changes = [
-      { kind: 'E', path: ['details', 'with', '2'], lhs: 'elements', rhs: 'more' },
-      { kind: 'A', path: ['details', 'with'], index: 3, item: { kind: 'N', rhs: 'elements' } },
+    const changes: any = [
+      { k: 'E', p: ['details', 'with', '2'], l: 'elements', r: 'more' },
+      { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements' } },
     ];
 
-    await Diff.createOrUpdateDiffs(docId, changes);
-    const diffs = await Diff.findAllByDocId(docId);
+    const diff1 = await Diff.createDiff(docId, changes);
+    const diff2 = await Diff.createDiff(docId, [changes[0]]);
 
-    expect(Array.isArray(diffs)).toBeTruthy();
-    expect(diffs[0].path.join('.')).toBe('details.with.2');
-    expect(diffs[1].path.join('.')).toBe('details.with');
+    expect(diff1.v).toBe(1);
+    expect(diff2.v).toBe(2);
 
-    expect(diffs[0].changes[0].kind).toBe('E');
-    expect(diffs[0].changes[0].lhs).toBe('elements');
-    expect(diffs[0].changes[0].rhs).toBe('more');
+    expect(diff1.c).toMatchInlineSnapshot(`
+CoreMongooseArray [
+  Object {
+    "k": "E",
+    "l": "elements",
+    "p": Array [
+      "details",
+      "with",
+      "2",
+    ],
+    "r": "more",
+  },
+  Object {
+    "i": 3,
+    "it": Object {
+      "k": "N",
+      "r": "elements",
+    },
+    "k": "A",
+    "p": Array [
+      "details",
+      "with",
+    ],
+  },
+]
+`);
+
+    expect(diff2.c).toMatchInlineSnapshot(`
+CoreMongooseArray [
+  Object {
+    "k": "E",
+    "l": "elements",
+    "p": Array [
+      "details",
+      "with",
+      "2",
+    ],
+    "r": "more",
+  },
+]
+`);
   });
 });
