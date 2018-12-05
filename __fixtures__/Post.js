@@ -19,6 +19,10 @@ export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
         name: { type: String, track_diff: false },
       },
     ],
+    updatedAt: {
+      type: Date,
+      track_diff: false,
+    },
   },
   {
     versionKey: false,
