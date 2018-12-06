@@ -59,7 +59,7 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
     return 1;
   }
 
-  static async findAll(dId: ObjectId): Promise<Array<DiffDoc>> {
+  static async findAllByDocId(dId: ObjectId): Promise<Array<DiffDoc>> {
     return this.find({ dId }).exec();
   }
 
