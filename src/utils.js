@@ -1,5 +1,5 @@
 // @flow
-/* eslint-disable camelcase, no-bitwise */
+/* eslint-disable camelcase, no-bitwise, no-param-reassign */
 
 import type { MongooseSchema } from 'mongoose';
 
@@ -111,4 +111,28 @@ export const getOrderIndependentHash = (obj: any): number => {
   }
   const stringToHash = `[ type: ${type} ; value: ${obj.toString()}]`;
   return accum + hashThisString(stringToHash);
+};
+
+export const mergeDiffs = (diffs: Array<any>): Map<string, Object> => {
+  const merged: Map<string, Object> = new Map();
+
+  diffs.forEach(diff => {
+    const path = diff.p.join('.');
+    delete diff.p;
+    if (merged.has(path)) {
+      const oldDiff = merged.get(path);
+      // if (oldDiff.l === diff.r) => loop back
+      if (oldDiff && oldDiff.l !== diff.r) {
+        if (!oldDiff.l && diff.r) oldDiff.k = 'N';
+        if (oldDiff.l && !diff.r) oldDiff.k = 'D';
+        if (oldDiff.l && diff.r) oldDiff.k = 'E'; // cannot be same because inside oldDiff.l !== diff.r cond.
+        oldDiff.r = diff.r;
+        merged.set(path, oldDiff);
+      }
+    } else {
+      merged.set(path, diff);
+    }
+  });
+
+  return merged;
 };

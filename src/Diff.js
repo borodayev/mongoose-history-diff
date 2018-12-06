@@ -43,7 +43,6 @@ export default function(
       versionKey: false,
     }
   );
-
   ChangeSchema.loadClass(ChangeDoc);
 
   const DiffSchema = new Schema(
@@ -54,7 +53,6 @@ export default function(
     },
     { versionKey: false, timestamps: true, collection: collectionName }
   );
-
   DiffSchema.loadClass(DiffDoc);
   DiffSchema.index({ docId: 1, path: 1 });
 

@@ -2,6 +2,7 @@
 /* eslint-disable no-await-in-loop */
 
 import type { ObjectId, MongooseModel } from 'mongoose';
+import { mergeDiffs } from './utils';
 
 export type OptionsT = {|
   diffCollectionName: ?string,
@@ -43,14 +44,14 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
   c: Array<ChangeDoc>;
   v: number;
 
-  static async createDiff(docId: ObjectId, changes: Array<RawChangeT>): Promise<DiffDoc> {
-    const v = await this.getNextVersion(docId);
-    const doc = new this({ dId: docId, c: (changes: any), v });
+  static async createDiff(dId: ObjectId, changes: Array<RawChangeT>): Promise<DiffDoc> {
+    const v = await this.getNextVersion(dId);
+    const doc = new this({ dId, c: (changes: any), v });
     return doc.save();
   }
 
-  static async getNextVersion(docId: ObjectId): Promise<number> {
-    const doc = await this.find({ dId: docId }, { v: 1, _id: 0 })
+  static async getNextVersion(dId: ObjectId): Promise<number> {
+    const doc = await this.find({ dId }, { v: 1, _id: 0 })
       .sort({ v: -1 })
       .limit(1);
 
@@ -58,7 +59,21 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
     return 1;
   }
 
-  static async findAllByDocId(docId: ObjectId): Promise<Array<DiffDoc>> {
-    return this.find({ dId: docId }).exec();
+  static async findAll(dId: ObjectId): Promise<Array<DiffDoc>> {
+    return this.find({ dId }).exec();
+  }
+
+  static async getMerged(dId: ObjectId): Promise<Map<string, Object>> {
+    const diffs = await this.aggregate([
+      { $match: { dId } },
+      { $sort: { v: 1 } },
+      { $unwind: { path: '$c' } },
+      { $project: { _id: 0, p: '$c.p', k: '$c.k', l: '$c.l', r: '$c.r' } },
+    ]).exec();
+
+    if (diffs?.length > 0) {
+      return mergeDiffs(diffs);
+    }
+    return new Map();
   }
 }
