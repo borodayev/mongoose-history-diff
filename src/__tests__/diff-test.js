@@ -79,4 +79,157 @@ CoreMongooseArray [
 ]
 `);
   });
+
+  describe('getMerged()', () => {
+    const Diff = DiffModel(DB.data, 'diffs');
+
+    it('with objects (added)', async () => {
+      // $FlowFixMe
+      const docId = mongoose.Types.ObjectId();
+      const changes1: any = [
+        { k: 'N', p: ['same'], r: 'new1' },
+        { k: 'N', p: ['different'], r: 'new2' },
+      ];
+
+      const changes2: any = [
+        { k: 'N', p: ['same'], r: 'new11' },
+        { k: 'E', p: ['different'], l: 'abc', r: 'new22' },
+      ];
+
+      await Diff.createDiff(docId, changes1);
+      await Diff.createDiff(docId, changes2);
+
+      const merged = await Diff.getMerged(docId);
+      expect(merged).toMatchInlineSnapshot(`
+Map {
+  "same" => Object {
+    "k": "N",
+    "r": "new11",
+  },
+  "different" => Object {
+    "k": "N",
+    "r": "new22",
+  },
+}
+`);
+    });
+
+    it('with objects (deleted)', async () => {
+      // $FlowFixMe
+      const docId = mongoose.Types.ObjectId();
+      const changes1: any = [
+        { k: 'E', p: ['same'], l: 'new1', r: 'updatedNew1' },
+        { k: 'D', p: ['different'], l: 'new2' },
+      ];
+
+      const changes2: any = [
+        { k: 'D', p: ['same'], l: 'new11sd' },
+        { k: 'D', p: ['different'], l: 'abc' },
+      ];
+
+      await Diff.createDiff(docId, changes1);
+      await Diff.createDiff(docId, changes2);
+
+      const merged = await Diff.getMerged(docId);
+      expect(merged).toMatchInlineSnapshot(`
+Map {
+  "same" => Object {
+    "k": "D",
+    "l": "new1",
+    "r": undefined,
+  },
+  "different" => Object {
+    "k": "D",
+    "l": "new2",
+    "r": undefined,
+  },
+}
+`);
+    });
+
+    it('with objects (edited)', async () => {
+      // $FlowFixMe
+      const docId = mongoose.Types.ObjectId();
+      const changes1: any = [
+        { k: 'E', p: ['ee'], l: 'new1', r: 'updatedNew1' },
+        { k: 'E', p: ['en'], l: 'new2', r: 'updatedNew2' },
+        { k: 'D', p: ['de'], l: 'new3' },
+        { k: 'D', p: ['dn'], l: 'new4' },
+      ];
+
+      const changes2: any = [
+        { k: 'E', p: ['ee'], l: 'new11', r: 'updatedNew11' },
+        { k: 'N', p: ['en'], r: 'new22' },
+        { k: 'E', p: ['de'], l: 'abc', r: 'updatedNew33' },
+        { k: 'N', p: ['dn'], r: 'new44' },
+      ];
+
+      await Diff.createDiff(docId, changes1);
+      await Diff.createDiff(docId, changes2);
+
+      const merged = await Diff.getMerged(docId);
+      expect(merged).toMatchInlineSnapshot(`
+Map {
+  "ee" => Object {
+    "k": "E",
+    "l": "new1",
+    "r": "updatedNew11",
+  },
+  "en" => Object {
+    "k": "E",
+    "l": "new2",
+    "r": "new22",
+  },
+  "de" => Object {
+    "k": "E",
+    "l": "new3",
+    "r": "updatedNew33",
+  },
+  "dn" => Object {
+    "k": "E",
+    "l": "new4",
+    "r": "new44",
+  },
+}
+`);
+    });
+
+    it.skip('getMerged() with arrays', async () => {
+      // $FlowFixMe
+      const docId = mongoose.Types.ObjectId();
+      const changes1: any = [
+        { k: 'A', p: ['arrayField'], i: 1, it: { k: 'N', r: 'new element 1' } },
+      ];
+
+      const changes2: any = [
+        { k: 'A', p: ['arrayField'], i: 1, it: { k: 'D', l: 'new element 1' } },
+      ];
+      const changes3: any = [
+        { k: 'A', p: ['arrayField'], i: 1, it: { k: 'N', r: 'new element 2' } },
+        { k: 'A', p: ['arrayField'], i: 2, it: { k: 'E', l: 'was', r: 'now' } },
+      ];
+
+      await Diff.createDiff(docId, changes1);
+      await Diff.createDiff(docId, changes2);
+      await Diff.createDiff(docId, changes3);
+
+      const merged = await Diff.getMerged(docId);
+      expect(merged).toMatchInlineSnapshot(`
+Map {
+  "same" => Object {
+    "k": "E",
+    "l": "elements",
+    "r": "now",
+    "v": 1,
+  },
+  "different" => Object {
+    "k": "E",
+    "l": "gdr",
+    "r": "frg",
+    "v": 2,
+  },
+}
+`);
+    });
+  });
 });
