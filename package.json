@@ -27,7 +27,7 @@
   "homepage": "https://github.com/FrankAst/mongoose-dp",
   "license": "MIT",
   "peerDependencies": {
-    "mongoose": "^5.3.14"
+    "mongoose": "^5.3.15"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
@@ -54,9 +54,7 @@
     "flow-bin": "^0.87.0",
     "jest": "23.6.0",
     "mongodb-memory-server": "^2.7.2",
-    "nodemon": "^1.15.1",
     "prettier": "^1.10.2",
-    "rimraf": "^2.6.2",
     "semantic-release": "^15.0.3"
   },
   "publishConfig": {
