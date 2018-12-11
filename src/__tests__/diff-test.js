@@ -2,7 +2,7 @@
 
 import mongoose from 'mongoose';
 import DB from '../../__fixtures__/db';
-import DiffModel from '../Diff';
+import DiffModel from '../DiffModel';
 
 jest.mock('../../__fixtures__/db.js');
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;

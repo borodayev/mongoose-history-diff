@@ -1,6 +1,6 @@
 // /* eslint-disable */
 
-import findDiff from '../findDiff';
+import { findDiff } from '../diff';
 
 describe('findDiff', () => {
   it('object', () => {

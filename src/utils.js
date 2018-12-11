@@ -113,26 +113,56 @@ export const getOrderIndependentHash = (obj: any): number => {
   return accum + hashThisString(stringToHash);
 };
 
-export const mergeDiffs = (diffs: Array<any>): Map<string, Object> => {
-  const merged: Map<string, Object> = new Map();
+export const arrayRemove = (arr, from, to) => {
+  const rest = arr.slice((to || from) + 1 || arr.length);
+  arr.length = from < 0 ? arr.length + from : from;
+  arr.push(...rest);
+  return arr;
+};
 
-  diffs.forEach(diff => {
-    const path = diff.p.join('.');
-    delete diff.p;
-    if (merged.has(path)) {
-      const oldDiff = merged.get(path);
-      // if (oldDiff.l === diff.r) => loop back
-      if (oldDiff && oldDiff.l !== diff.r) {
-        if (!oldDiff.l && diff.r) oldDiff.k = 'N';
-        if (oldDiff.l && !diff.r) oldDiff.k = 'D';
-        if (oldDiff.l && diff.r) oldDiff.k = 'E'; // cannot be same because inside oldDiff.l !== diff.r cond.
-        oldDiff.r = diff.r;
-        merged.set(path, oldDiff);
-      }
-    } else {
-      merged.set(path, diff);
+export const revertArrayChange = (arr, index, change) => {
+  if (change.path && change.path.length) {
+    // the structure of the object at the index has changed...
+    let it = arr[index];
+    let i;
+    const u = change.path.length - 1;
+    for (i = 0; i < u; i++) {
+      it = it[change.path[i]];
     }
-  });
-
-  return merged;
+    switch (change.kind) {
+      case 'A':
+        revertArrayChange(it[change.path[i]], change.index, change.item);
+        break;
+      case 'D':
+        it[change.path[i]] = change.lhs;
+        break;
+      case 'E':
+        it[change.path[i]] = change.lhs;
+        break;
+      case 'N':
+        delete it[change.path[i]];
+        break;
+      default:
+        '';
+    }
+  } else {
+    // the array item is different...
+    switch (change.kind) {
+      case 'A':
+        revertArrayChange(arr[index], change.index, change.item);
+        break;
+      case 'D':
+        arr[index] = change.lhs;
+        break;
+      case 'E':
+        arr[index] = change.lhs;
+        break;
+      case 'N':
+        arr = arrayRemove(arr, index);
+        break;
+      default:
+        '';
+    }
+  }
+  return arr;
 };

@@ -25,7 +25,6 @@ export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
     },
   },
   {
-    versionKey: false,
     timestamps: true,
     collection: 'post',
   }
