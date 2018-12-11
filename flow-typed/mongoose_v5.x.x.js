@@ -183,7 +183,7 @@ declare class Mongoose$Schema<Doc> {
   virtualpath(name: string): ?VirtualType;
   indexTypes(): string[];
   reserved: string[];
-  obj: SchemaOpts<Doc>;
+  options: SchemaOpts<Doc>;
   _indexes: Array<
     [{ [fieldName: string]: number | string }, { [optionName: string]: mixed }]
   >;
