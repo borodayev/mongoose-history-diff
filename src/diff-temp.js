@@ -167,35 +167,31 @@ export const deepDiff = (
   }
 };
 
-export const revertChange = (target, change) => {
-  if (target && change?.kind) {
+export const revertChange = (target: any, change: RawChangeT) => {
+  if (target && change?.k) {
     let it = target;
     let i;
 
-    const u = change.path.length - 1;
+    const u = change.p.length - 1;
     for (i = 0; i < u; i++) {
-      if (typeof it[change.path[i]] === 'undefined') {
-        it[change.path[i]] = {};
+      if (typeof it[change.p[i]] === 'undefined') {
+        it[change.p[i]] = {};
       }
-      it = it[change.path[i]];
+      it = it[change.p[i]];
     }
-    switch (change.kind) {
+    switch (change.k) {
       case 'A':
-        // Array was modified...
-        // it will be an array...
-        revertArrayChange(it[change.path[i]], change.index, change.item);
+        // $FlowFixMe
+        revertArrayChange(it[change.p[i]], change.i, change.it);
         break;
       case 'D':
-        // Item was deleted...
-        it[change.path[i]] = change.lhs;
+        it[change.p[i]] = change.l;
         break;
       case 'E':
-        // Item was edited...
-        it[change.path[i]] = change.lhs;
+        it[change.p[i]] = change.l;
         break;
       case 'N':
-        // Item is new...
-        delete it[change.path[i]];
+        delete it[change.p[i]];
         break;
       default:
         '';
