@@ -6,6 +6,8 @@ import {
   realTypeOf,
   hashThisString,
   getOrderIndependentHash,
+  arrayRemove,
+  revertArrayChange,
 } from '../utils';
 
 describe('utils', () => {
@@ -119,5 +121,55 @@ describe('utils', () => {
     expect(array).toBe(976844698);
     expect(obj).toBe(-2385456289);
     expect(string).toBe(35072500);
+  });
+
+  it('arrayRemove()', () => {
+    const slicedFrom = arrayRemove(
+      [
+        { k: 'A', p: ['details', 'with'], i: 1, it: { k: 'N', r: 'elements1' } },
+        { k: 'A', p: ['details', 'with'], i: 2, it: { k: 'N', r: 'elements2' } },
+        { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements3' } },
+        { k: 'A', p: ['details', 'with'], i: 4, it: { k: 'N', r: 'elements4' } },
+      ],
+      1
+    );
+
+    const slicedFromTo = arrayRemove(
+      [
+        { k: 'A', p: ['details', 'with'], i: 1, it: { k: 'N', r: 'elements1' } },
+        { k: 'A', p: ['details', 'with'], i: 2, it: { k: 'N', r: 'elements2' } },
+        { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements3' } },
+        { k: 'A', p: ['details', 'with'], i: 4, it: { k: 'N', r: 'elements4' } },
+      ],
+      1,
+      2
+    );
+
+    expect(slicedFrom).toEqual([
+      { i: 1, it: { k: 'N', r: 'elements1' }, k: 'A', p: ['details', 'with'] },
+      { i: 3, it: { k: 'N', r: 'elements3' }, k: 'A', p: ['details', 'with'] },
+      { i: 4, it: { k: 'N', r: 'elements4' }, k: 'A', p: ['details', 'with'] },
+    ]);
+
+    expect(slicedFromTo).toEqual([
+      { i: 1, it: { k: 'N', r: 'elements1' }, k: 'A', p: ['details', 'with'] },
+      { i: 4, it: { k: 'N', r: 'elements4' }, k: 'A', p: ['details', 'with'] },
+    ]);
+  });
+
+  it('revertArrayChange()', () => {
+    const revertedNew = revertArrayChange([1, 2, 3, 4], 3, { k: 'N', r: 4 });
+    const revertedDeleted = revertArrayChange([1, 2, 3], 3, { k: 'D', l: 4 });
+    const revertedEdited = revertArrayChange([1, 2, 3, 6], 3, { k: 'E', l: 5, r: 6 });
+    const revertedArray = revertArrayChange([[1, 2], [1, 3]], 1, {
+      k: 'A',
+      i: 1,
+      it: { k: 'E', l: 2, r: 3 },
+    });
+
+    expect(revertedNew).toEqual([1, 2, 3]);
+    expect(revertedDeleted).toEqual([1, 2, 3, 4]);
+    expect(revertedEdited).toEqual([1, 2, 3, 5]);
+    expect(revertedArray).toEqual([[1, 2], [1, 2]]);
   });
 });
