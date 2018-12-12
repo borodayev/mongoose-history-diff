@@ -2,6 +2,7 @@
 /* eslint-disable camelcase, no-bitwise, no-param-reassign */
 
 import type { MongooseSchema } from 'mongoose';
+import type { RawChangeT } from './definitions';
 
 export type ExcludeFieldT = {|
   key: string,
@@ -113,49 +114,50 @@ export const getOrderIndependentHash = (obj: any): number => {
   return accum + hashThisString(stringToHash);
 };
 
-export const arrayRemove = (arr, from, to) => {
+export const arrayRemove = (arr: Array<any>, from: number, to: ?number): Array<any> => {
   const rest = arr.slice((to || from) + 1 || arr.length);
   arr.length = from < 0 ? arr.length + from : from;
   arr.push(...rest);
   return arr;
 };
 
-export const revertArrayChange = (arr, index, change) => {
-  if (change.path && change.path.length) {
+export const revertArrayChange = (arr: Array<any>, index: number, change: any): Array<any> => {
+  if (change?.p?.length) {
     // the structure of the object at the index has changed...
-    let it = arr[index];
-    let i;
-    const u = change.path.length - 1;
-    for (i = 0; i < u; i++) {
-      it = it[change.path[i]];
+    let element = arr[index];
+    let j;
+    const u = change.p.length - 1;
+    for (j = 0; j < u; j++) {
+      element = element[change.p[j]];
     }
     switch (change.kind) {
       case 'A':
-        revertArrayChange(it[change.path[i]], change.index, change.item);
+        revertArrayChange(element[change.p[j]], change.i, change.it);
         break;
       case 'D':
-        it[change.path[i]] = change.lhs;
+        element[change.p[j]] = change.l;
         break;
       case 'E':
-        it[change.path[i]] = change.lhs;
+        element[change.p[j]] = change.l;
         break;
       case 'N':
-        delete it[change.path[i]];
+        delete element[change.p[j]];
         break;
       default:
         '';
     }
   } else {
     // the array item is different...
-    switch (change.kind) {
+    switch (change.k) {
       case 'A':
-        revertArrayChange(arr[index], change.index, change.item);
+        // $FlowFixMe
+        revertArrayChange(arr[index], change.i, change.it);
         break;
       case 'D':
-        arr[index] = change.lhs;
+        arr[index] = change.l;
         break;
       case 'E':
-        arr[index] = change.lhs;
+        arr[index] = change.l;
         break;
       case 'N':
         arr = arrayRemove(arr, index);
