@@ -199,40 +199,13 @@ export const revertChange = (target: any, change: RawChangeT) => {
   }
 };
 
-export const observableDiff = (
-  lhs: mixed,
-  rhs: mixed,
-  observer: ((diff: RawChangeT) => void) | null,
-  prefilter: PrefilterT,
-  orderIndependent: boolean
-): Array<RawChangeT> => {
-  const changes = [];
-  deepDiff(lhs, rhs, changes, { prefilter, orderIndependent });
-  if (observer) {
-    changes.forEach(change => {
-      // $FlowFixMe
-      observer(change);
-    });
-  }
-  return changes;
-};
-
 export const findDiff = (
   lhs: mixed,
   rhs: mixed,
   orderIndependent: boolean,
-  prefilter: PrefilterT,
-  accum: any
+  prefilter: PrefilterT
 ): Array<RawChangeT> => {
-  const observer = accum
-    ? difference => {
-        if (difference) {
-          if (!accum.push) throw new Error(`accum should have a 'push()' function`);
-          accum.push(difference);
-        }
-      }
-    : null;
-  const changes = observableDiff(lhs, rhs, observer, prefilter, orderIndependent);
-
-  return accum || changes;
+  const changes = [];
+  deepDiff(lhs, rhs, changes, { prefilter, orderIndependent });
+  return changes;
 };
