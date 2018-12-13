@@ -167,13 +167,12 @@ export const deepDiff = (
   }
 };
 
-export const revertChange = (target: any, change: RawChangeT) => {
-  if (target && change?.k) {
-    let it = target;
+export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
+  const copyTarget = { ...target };
+  changes.forEach(change => {
+    let it = copyTarget;
     let i;
-
-    const u = change.p.length - 1;
-    for (i = 0; i < u; i++) {
+    for (i = 0; i < change.p.length - 1; i++) {
       if (typeof it[change.p[i]] === 'undefined') {
         it[change.p[i]] = {};
       }
@@ -196,7 +195,8 @@ export const revertChange = (target: any, change: RawChangeT) => {
       default:
         '';
     }
-  }
+  });
+  return copyTarget;
 };
 
 export const findDiff = (
