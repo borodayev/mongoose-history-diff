@@ -1,6 +1,6 @@
 // /* eslint-disable */
 
-import { findDiff } from '../diff';
+import { findDiff, revertChanges } from '../diff';
 
 describe('findDiff', () => {
   it('object', () => {
@@ -59,6 +59,7 @@ describe('findDiff', () => {
 
     const newDiffs = findDiff([], lhs);
     const modifiedDiffs = findDiff(lhs, rhs);
+    const deletedDiffs = findDiff([1, 2, 3, 4], [1, 2, 4]);
     const itself = findDiff(lhs, lhs);
     const orderIndependent = findDiff([1, 2, 3], [1, 3, 2], true);
     const orderIndependentObj = findDiff(
@@ -76,6 +77,10 @@ describe('findDiff', () => {
       { k: 'E', l: 1, p: ['1', 'b'], r: 12 },
       { k: 'N', p: ['1', 'd'], r: ['sd', 'sq'] },
       { k: 'E', l: 'a', p: ['0'], r: 'ab' },
+    ]);
+    expect(deletedDiffs).toEqual([
+      { i: 3, it: { k: 'D', l: 4 }, k: 'A', p: [] },
+      { k: 'E', l: 3, p: ['2'], r: 4 },
     ]);
     expect(orderDepended).toEqual([
       { k: 'E', l: 3, p: ['2'], r: 2 },
@@ -109,5 +114,113 @@ describe('findDiff', () => {
       { k: 'E', l: 0, p: ['number'], r: 1 },
       { k: 'N', p: ['newString'], r: 'str2' },
     ]);
+  });
+  it('prefilter', () => {
+    const lhs = {
+      obj: { a: 'a', b: 'b' },
+      array: ['a', 'b'],
+      string: 'str',
+      number: 0,
+      date: new Date('2018/12/30'),
+    };
+    const rhs = {
+      obj: { a: 'ab' },
+      array: ['ab'],
+      string: 'str1',
+      newString: 'str2',
+      number: 1,
+      date: new Date('2018/11/30'),
+    };
+
+    const diffs = findDiff(lhs, rhs, false, (path, key) => ['obj', 'array', 'date'].includes(key));
+    expect(diffs).toEqual([
+      { k: 'E', l: 'str', p: ['string'], r: 'str1' },
+      { k: 'E', l: 0, p: ['number'], r: 1 },
+      { k: 'N', p: ['newString'], r: 'str2' },
+    ]);
+  });
+
+  describe('revertChanges', () => {
+    it('editing', () => {
+      const target = {
+        obj: { a: 'become', b: 'b' },
+        array: ['become', 'b'],
+        string: 'become',
+        number: 0,
+        date: new Date('2018/12/30'),
+      };
+
+      const changes = [
+        { k: 'E', p: ['obj', 'a'], l: 'was', r: 'become' },
+        { k: 'E', p: ['array', '0'], l: 'was', r: 'become' },
+        { k: 'E', p: ['string'], l: 'was', r: 'become' },
+        { k: 'E', p: ['number'], l: 1, r: 0 },
+        { k: 'E', p: ['date'], l: new Date('2018/11/30'), r: new Date('2018/12/30') },
+      ];
+
+      const revertedTarget = revertChanges(target, changes);
+
+      // must be immutable
+      expect(target === revertedTarget).toBeFalsy();
+      expect(revertedTarget).toEqual({
+        array: ['was', 'b'],
+        date: new Date('2018/11/30'),
+        number: 1,
+        obj: { a: 'was', b: 'b' },
+        string: 'was',
+      });
+    });
+
+    it('adding', () => {
+      const target = {
+        obj: { a: 'become', b: 'b' },
+        array: ['become', 'b'],
+        string: 'become',
+        number: 0,
+        date: new Date('2018/12/30'),
+      };
+
+      const changes = [
+        { k: 'N', p: ['obj', 'a'], r: 'become' },
+        { k: 'A', p: ['array'], i: 0, it: { k: 'N', r: 'become' } },
+        { k: 'N', p: ['string'], r: 'become' },
+        { k: 'N', p: ['number'], r: 0 },
+        { k: 'N', p: ['date'], r: new Date('2018/12/30') },
+      ];
+
+      const revertedTarget = revertChanges(target, changes);
+
+      // must be immutable
+      expect(target === revertedTarget).toBeFalsy();
+      expect(revertedTarget).toEqual({ array: ['b'], obj: { b: 'b' } });
+    });
+
+    it('deleting', () => {
+      const target = {
+        obj: { b: 'b' },
+        array: [1, 2, 4], // [1, 2, 3, 4]
+      };
+
+      const changes = [
+        { k: 'D', p: ['obj', 'a'], l: 'was' },
+        { k: 'A', p: ['array'], i: 3, it: { k: 'D', l: 4 } },
+        { k: 'E', p: ['array', '2'], l: 3, r: 4 },
+        { k: 'D', p: ['string'], l: 'was' },
+        { k: 'D', p: ['number'], l: 0 },
+        { k: 'D', p: ['date'], l: new Date('2018/12/30') },
+      ];
+
+      const revertedTarget = revertChanges(target, changes);
+
+      // must be immutable
+      expect(target === revertedTarget).toBeFalsy();
+      expect(revertedTarget).toEqual({
+        array: [1, 2, 3, 4],
+        date: new Date('2018/12/30'),
+        number: 0,
+        obj: { a: 'was', b: 'b' },
+        string: 'was',
+      });
+    });
   });
 });
