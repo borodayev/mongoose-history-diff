@@ -2,7 +2,6 @@
 /* eslint-disable camelcase, no-bitwise, no-param-reassign */
 
 import type { MongooseSchema } from 'mongoose';
-import type { RawChangeT } from './definitions';
 
 export type ExcludeFieldT = {|
   key: string,
@@ -126,8 +125,7 @@ export const revertArrayChange = (arr: Array<any>, index: number, change: any): 
     // the structure of the object at the index has changed...
     let element = arr[index];
     let j;
-    const u = change.p.length - 1;
-    for (j = 0; j < u; j++) {
+    for (j = 0; j < change.p.length - 1; j++) {
       element = element[change.p[j]];
     }
     switch (change.kind) {
