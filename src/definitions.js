@@ -2,7 +2,7 @@
 /* eslint-disable no-await-in-loop */
 
 import type { ObjectId, MongooseModel } from 'mongoose';
-// import { mergeDiffs } from './utils';
+import { revertChanges } from './diff';
 
 export type OptionsT = {|
   diffCollectionName: ?string,
@@ -51,5 +51,17 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
 
   static async findAllByDocId(dId: ObjectId): Promise<Array<DiffDoc>> {
     return this.find({ dId }).exec();
+  }
+
+  static async findAllTillVersion(dId: ObjectId, v: number): Promise<Array<DiffDoc>> {
+    return this.find({ dId, v: { $gte: v } })
+      .sort({ v: -1 })
+      .exec();
+  }
+
+  static async revertToVersion(doc: any, v: number): Promise<any> {
+    const changes = await this.findAllTillVersion(doc._id, v);
+    // const revertedDoc = revertChanges();
+    return changes;
   }
 }

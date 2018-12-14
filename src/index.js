@@ -29,7 +29,7 @@ export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) 
     if (!this.isNew) {
       const lhs = this._original;
       const rhs = this.toObject();
-      const version = this[versionKey];
+      const version = this[versionKey] + 1; // cause we're inside preSave hook
       const Diff: DiffModelT = this.constructor.diffModel();
       const orderIndep = options?.orderIndepended || false;
       const diffs: Array<RawChangeT> = (findDiff(lhs, rhs, orderIndep, (path, key) =>
