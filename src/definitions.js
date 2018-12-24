@@ -60,8 +60,14 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
   }
 
   static async revertToVersion(doc: any, v: number): Promise<any> {
-    const changes = await this.findAllTillVersion(doc._id, v);
-    // const revertedDoc = revertChanges();
-    return changes;
+    const changes: Array<RawChangeT> = [];
+    const diffDocs = (await this.findAllTillVersion(doc._id, v): any);
+    if (diffDocs?.length === 0) {
+      return doc;
+    }
+
+    diffDocs.forEach(d => changes.push(...d.c));
+    const revertedDoc = revertChanges(doc, changes);
+    return revertedDoc;
   }
 }

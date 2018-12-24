@@ -3,6 +3,7 @@
 import mongoose from 'mongoose';
 import DB from '../../__fixtures__/db';
 import DiffModel from '../DiffModel';
+import { Post, type PostDoc } from '../../__fixtures__/Post';
 
 jest.mock('../../__fixtures__/db.js');
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
@@ -29,6 +30,7 @@ describe('Diff', () => {
     const changes: any = [
       { k: 'E', p: ['details', 'with', '2'], l: 'elements', r: 'more' },
       { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements' } },
+      ,
     ];
 
     const diff1 = await Diff.createDiff(docId, 1, changes);
@@ -80,19 +82,125 @@ CoreMongooseArray [
 `);
   });
 
-  it.only('findAllTillVersion()', async () => {
+  it('findAllTillVersion()', async () => {
     const Diff = DiffModel(DB.data, 'diffs');
     // $FlowFixMe
     const docId = mongoose.Types.ObjectId();
     const changes: any = [
       { k: 'E', p: ['details', 'with', '2'], l: 'elements', r: 'more' },
       { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements' } },
+      ,
     ];
 
     await Diff.createDiff(docId, 1, changes);
     await Diff.createDiff(docId, 2, [changes[0]]);
 
-    const tillV1 = Diff.findAllTillVersion(docId, 1);
-    expect(tillV1).toBe();
+    const tillV1 = await Diff.findAllTillVersion(docId, 1);
+    const tillV2 = await Diff.findAllTillVersion(docId, 2);
+    expect(tillV1[0].c).toMatchInlineSnapshot(`
+CoreMongooseArray [
+  Object {
+    "k": "E",
+    "l": "elements",
+    "p": Array [
+      "details",
+      "with",
+      "2",
+    ],
+    "r": "more",
+  },
+]
+`);
+    expect(tillV1[1].c).toMatchInlineSnapshot(`
+CoreMongooseArray [
+  Object {
+    "k": "E",
+    "l": "elements",
+    "p": Array [
+      "details",
+      "with",
+      "2",
+    ],
+    "r": "more",
+  },
+  Object {
+    "i": 3,
+    "it": Object {
+      "k": "N",
+      "r": "elements",
+    },
+    "k": "A",
+    "p": Array [
+      "details",
+      "with",
+    ],
+  },
+]
+`);
+
+    expect(tillV2[0].c).toMatchInlineSnapshot(`
+CoreMongooseArray [
+  Object {
+    "k": "E",
+    "l": "elements",
+    "p": Array [
+      "details",
+      "with",
+      "2",
+    ],
+    "r": "more",
+  },
+]
+`);
+  });
+
+  it.only('revertToVersion()', async () => {
+    await Post.create({ title: 'test', subjects: [{ name: 'matsdcsdch' }] });
+    const post: PostDoc = (await Post.findOne({ title: 'test' }).exec(): any);
+    post.title = 'updated';
+    post.subjects = [{ name: 'math' }, { name: 'air' }];
+    await post.save();
+
+    const Diff = Post.diffModel();
+    const diffs = await Diff.findAllByDocId(post._id);
+
+    const revertedDoc = await Diff.revertToVersion(post, 1);
+
+    expect(diffs[0].c).toMatchInlineSnapshot(`
+CoreMongooseArray [
+  Object {
+    "k": "E",
+    "l": "test",
+    "p": Array [
+      "title",
+    ],
+    "r": "updated",
+  },
+  Object {
+    "i": 1,
+    "it": Object {
+      "k": "N",
+      "r": Object {
+        "name": "air",
+      },
+    },
+    "k": "A",
+    "p": Array [
+      "subjects",
+    ],
+  },
+  Object {
+    "k": "E",
+    "l": "matsdcsdch",
+    "p": Array [
+      "subjects",
+      "0",
+      "name",
+    ],
+    "r": "math",
+  },
+]
+`);
+    expect(revertedDoc).toBe();
   });
 });

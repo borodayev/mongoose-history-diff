@@ -31,6 +31,6 @@ describe('mongoose-dp', () => {
 
     expect(Array.isArray(diffs)).toBeTruthy();
     expect(diffs[0].c).toMatchSnapshot();
-    expect(diffs[0].v).toBe(0);
+    expect(diffs[0].v).toBe(1);
   });
 });

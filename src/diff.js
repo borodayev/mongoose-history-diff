@@ -172,6 +172,7 @@ export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
   changes.forEach(change => {
     let it = copyTarget;
     let i;
+
     for (i = 0; i < change.p.length - 1; i++) {
       if (typeof it[change.p[i]] === 'undefined') {
         it[change.p[i]] = {};

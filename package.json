@@ -84,5 +84,8 @@
     "flow": "./node_modules/.bin/flow",
     "test": "npm run coverage && npm run lint && npm run flow",
     "semantic-release": "semantic-release"
+  },
+  "dependencies": {
+    "mongoose": "^5.4.0"
   }
 }
