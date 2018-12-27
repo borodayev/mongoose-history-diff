@@ -27,7 +27,7 @@
   "homepage": "https://github.com/FrankAst/mongoose-dp",
   "license": "MIT",
   "peerDependencies": {
-    "mongoose": "^5.3.15"
+    "mongoose": "^5.4.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
@@ -84,8 +84,5 @@
     "flow": "./node_modules/.bin/flow",
     "test": "npm run coverage && npm run lint && npm run flow",
     "semantic-release": "semantic-release"
-  },
-  "dependencies": {
-    "mongoose": "^5.4.0"
   }
 }
