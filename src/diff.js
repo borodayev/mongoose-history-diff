@@ -168,7 +168,7 @@ export const deepDiff = (
 };
 
 export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
-  const copyTarget = { ...target };
+  const copyTarget = target?._doc ? { ...target._doc } : { ...target };
   changes.forEach(change => {
     let it = copyTarget;
     let i;
