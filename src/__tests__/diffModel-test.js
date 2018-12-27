@@ -30,7 +30,6 @@ describe('Diff', () => {
     const changes: any = [
       { k: 'E', p: ['details', 'with', '2'], l: 'elements', r: 'more' },
       { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements' } },
-      ,
     ];
 
     const diff1 = await Diff.createDiff(docId, 1, changes);
@@ -89,7 +88,6 @@ CoreMongooseArray [
     const changes: any = [
       { k: 'E', p: ['details', 'with', '2'], l: 'elements', r: 'more' },
       { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements' } },
-      ,
     ];
 
     await Diff.createDiff(docId, 1, changes);
@@ -154,53 +152,24 @@ CoreMongooseArray [
 `);
   });
 
-  it.only('revertToVersion()', async () => {
-    await Post.create({ title: 'test', subjects: [{ name: 'matsdcsdch' }] });
+  it('revertToVersion()', async () => {
+    await Post.create({ title: 'test', subjects: [{ name: 'test' }] });
     const post: PostDoc = (await Post.findOne({ title: 'test' }).exec(): any);
     post.title = 'updated';
     post.subjects = [{ name: 'math' }, { name: 'air' }];
     await post.save();
 
     const Diff = Post.diffModel();
-    const diffs = await Diff.findAllByDocId(post._id);
-
     const revertedDoc = await Diff.revertToVersion(post, 1);
 
-    expect(diffs[0].c).toMatchInlineSnapshot(`
+    expect(revertedDoc.__v).toBe(1);
+    expect(revertedDoc.title).toBe('test');
+    expect(revertedDoc.subjects).toMatchInlineSnapshot(`
 CoreMongooseArray [
   Object {
-    "k": "E",
-    "l": "test",
-    "p": Array [
-      "title",
-    ],
-    "r": "updated",
-  },
-  Object {
-    "i": 1,
-    "it": Object {
-      "k": "N",
-      "r": Object {
-        "name": "air",
-      },
-    },
-    "k": "A",
-    "p": Array [
-      "subjects",
-    ],
-  },
-  Object {
-    "k": "E",
-    "l": "matsdcsdch",
-    "p": Array [
-      "subjects",
-      "0",
-      "name",
-    ],
-    "r": "math",
+    "name": "test",
   },
 ]
 `);
-    expect(revertedDoc).toBe();
   });
 });
