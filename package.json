@@ -1,5 +1,5 @@
 {
-  "name": "mongoose-dp",
+  "name": "mongoose-history-diff",
   "main": "lib/index.js",
   "version": "0.0.0-semantically-released",
   "description": "This is a mongoose plugin to take a diffs of your documents",
