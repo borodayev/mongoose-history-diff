@@ -1,7 +1,13 @@
 // @flow
 /* eslint-disable no-param-reassign */
 
-import { realTypeOf, getOrderIndependentHash, revertArrayChange } from './utils';
+import {
+  realTypeOf,
+  getOrderIndependentHash,
+  revertArrayChange,
+  excludeFields,
+  type ExcludeFieldT,
+} from './utils';
 import type { RawChangeT } from './definitions';
 
 export type PrefilterT = (path: Array<string>, key: string) => boolean;
@@ -200,13 +206,17 @@ export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
   return copyTarget;
 };
 
-export const findDiff = (
-  lhs: mixed,
-  rhs: mixed,
-  orderIndependent: boolean,
-  prefilter: PrefilterT
-): Array<RawChangeT> => {
-  const changes = [];
-  deepDiff(lhs, rhs, changes, { prefilter, orderIndependent });
-  return changes;
-};
+export default class MHD {
+  static orderIndependent: boolean = true;
+  static excludedFields: Array<ExcludeFieldT> = [];
+
+  static findDiff(lhs: any, rhs: any): Array<RawChangeT> {
+    console.log(`=======================================+>`, this.excludedFields);
+    const changes = [];
+    deepDiff(lhs, rhs, changes, {
+      prefilter: (path, key) => excludeFields(path, key, this.excludedFields),
+      orderIndependent: this.orderIndependent,
+    });
+    return changes;
+  }
+}

@@ -2,11 +2,11 @@
 /* eslint-disable no-await-in-loop */
 
 import type { ObjectId, MongooseModel } from 'mongoose';
-import { revertChanges } from './diff';
+import MHD, { revertChanges } from './diff';
 
 export type OptionsT = {|
   diffCollectionName: ?string,
-  orderIndepended: ?boolean,
+  orderIndependent: ?boolean,
 |};
 
 export type DiffModelT = MongooseModel & typeof DiffDoc;
@@ -49,19 +49,25 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
     return doc.save();
   }
 
-  static async findAllByDocId(dId: ObjectId): Promise<Array<DiffDoc>> {
+  static async findByDocId(dId: ObjectId): Promise<Array<DiffDoc>> {
     return this.find({ dId }).exec();
   }
 
-  static async findAllTillVersion(dId: ObjectId, v: number): Promise<Array<DiffDoc>> {
+  static async findAfterVersion(dId: ObjectId, v: number): Promise<Array<DiffDoc>> {
     return this.find({ dId, v: { $gte: v } })
+      .sort({ v: -1 })
+      .exec();
+  }
+
+  static async findBeforeVersion(dId: ObjectId, v: number): Promise<Array<DiffDoc>> {
+    return this.find({ dId, v: { $lte: v } })
       .sort({ v: -1 })
       .exec();
   }
 
   static async revertToVersion(doc: any, v: number): Promise<any> {
     const changes: Array<RawChangeT> = [];
-    const diffDocs = (await this.findAllTillVersion(doc._id, v): any);
+    const diffDocs = (await this.findAfterVersion(doc._id, v): any);
     if (diffDocs?.length === 0) {
       return doc;
     }
@@ -69,5 +75,11 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
     diffDocs.forEach(d => changes.push(...d.c));
     const revertedDoc = revertChanges(doc, changes);
     return revertedDoc;
+  }
+
+  static async mergeDiffs(currentDoc: any): Promise<any> {
+    const initialDoc = this.revertToVersion(currentDoc, 1);
+    const diffs = MHD.findDiff(initialDoc, currentDoc);
+    return diffs;
   }
 }

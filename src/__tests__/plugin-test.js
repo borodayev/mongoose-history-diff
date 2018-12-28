@@ -11,8 +11,11 @@ describe('mongoose-dp', () => {
     const diff = new Diff({ p: ['title'], c: [{ p: ['way'] }] });
 
     expect(typeof Diff).toBe('function');
-    expect(typeof Diff.findAllByDocId).toBe('function');
+    expect(typeof Diff.findByDocId).toBe('function');
     expect(typeof Diff.createDiff).toBe('function');
+    expect(typeof Diff.findAfterVersion).toBe('function');
+    expect(typeof Diff.findBeforeVersion).toBe('function');
+    expect(typeof Diff.revertToVersion).toBe('function');
     // expect(typeof Diff.getNextVersion).toBe('function');
     expect(diff.c[0].p[0]).toBe('way');
   });
@@ -27,7 +30,7 @@ describe('mongoose-dp', () => {
     await post.save();
 
     const Diff = Post.diffModel();
-    const diffs = await Diff.findAllByDocId(post._id);
+    const diffs = await Diff.findByDocId(post._id);
 
     expect(Array.isArray(diffs)).toBeTruthy();
     expect(diffs[0].c).toMatchSnapshot();

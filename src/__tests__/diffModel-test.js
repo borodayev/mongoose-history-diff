@@ -81,7 +81,7 @@ CoreMongooseArray [
 `);
   });
 
-  it('findAllTillVersion()', async () => {
+  it('findAfterVersion()', async () => {
     const Diff = DiffModel(DB.data, 'diffs');
     // $FlowFixMe
     const docId = mongoose.Types.ObjectId();
@@ -93,8 +93,8 @@ CoreMongooseArray [
     await Diff.createDiff(docId, 1, changes);
     await Diff.createDiff(docId, 2, [changes[0]]);
 
-    const tillV1 = await Diff.findAllTillVersion(docId, 1);
-    const tillV2 = await Diff.findAllTillVersion(docId, 2);
+    const tillV1 = await Diff.findAfterVersion(docId, 1);
+    const tillV2 = await Diff.findAfterVersion(docId, 2);
     expect(tillV1[0].c).toMatchInlineSnapshot(`
 CoreMongooseArray [
   Object {
@@ -171,5 +171,17 @@ CoreMongooseArray [
   },
 ]
 `);
+  });
+
+  it('mergeDiffs()', async () => {
+    await Post.create({ title: 'test', subjects: [{ name: 'test' }] });
+    const post: PostDoc = (await Post.findOne({ title: 'test' }).exec(): any);
+    post.title = 'updated';
+    post.subjects = [{ name: 'math' }, { name: 'air' }];
+    await post.save();
+
+    const Diff = Post.diffModel();
+    const a = await Diff.mergeDiffs(post, false);
+    expect(a).toBe();
   });
 });

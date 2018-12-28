@@ -1,6 +1,6 @@
 // /* eslint-disable */
 
-import { findDiff, revertChanges } from '../diff';
+import MHD, { revertChanges } from '../diff';
 
 describe('findDiff', () => {
   it('object', () => {
@@ -20,10 +20,10 @@ describe('findDiff', () => {
       date: new Date('2018/11/30'),
     };
 
-    const newDiffs = findDiff({}, rhs);
-    const modifiedDiffs = findDiff(lhs, rhs);
-    const itself = findDiff(lhs, lhs);
-    const edited = findDiff({ a: 1 }, { a: 2 });
+    const newDiffs = MHD.findDiff({}, rhs);
+    const modifiedDiffs = MHD.findDiff(lhs, rhs);
+    const itself = MHD.findDiff(lhs, lhs);
+    const edited = MHD.findDiff({ a: 1 }, { a: 2 });
 
     expect(newDiffs).toEqual([
       { k: 'N', p: ['obj'], r: { a: 'ab' } },
@@ -57,17 +57,17 @@ describe('findDiff', () => {
     const lhs = ['a', { b: 1 }];
     const rhs = ['ab', { b: 12, d: ['sd', 'sq'] }];
 
-    const newDiffs = findDiff([], lhs);
-    const modifiedDiffs = findDiff(lhs, rhs);
-    const deletedDiffs = findDiff([1, 2, 3, 4], [1, 2, 4]);
-    const itself = findDiff(lhs, lhs);
-    const orderIndependent = findDiff([1, 2, 3], [1, 3, 2], true);
-    const orderIndependentObj = findDiff(
+    const newDiffs = MHD.findDiff([], lhs);
+    const modifiedDiffs = MHD.findDiff(lhs, rhs);
+    const deletedDiffs = MHD.findDiff([1, 2, 3, 4], [1, 2, 4]);
+    const itself = MHD.findDiff(lhs, lhs);
+    const orderIndependent = MHD.findDiff([1, 2, 3], [1, 3, 2], true);
+    const orderIndependentObj = MHD.findDiff(
       [{ a: 1 }, { a: 2, b: 3 }],
       [{ a: 2, b: 3 }, { a: 1 }],
       true
     );
-    const orderDepended = findDiff([1, 2, 3], [1, 3, 2], false);
+    const orderDepended = MHD.findDiff([1, 2, 3], [1, 3, 2], false);
 
     expect(newDiffs).toEqual([
       { i: 1, it: { k: 'N', r: { b: 1 } }, k: 'A', p: [] },
@@ -91,7 +91,7 @@ describe('findDiff', () => {
     expect(itself).toEqual([]);
   });
 
-  it('prefilter', () => {
+  it.only('prefilter', () => {
     const lhs = {
       obj: { a: 'a', b: 'b' },
       array: ['a', 'b'],
@@ -99,6 +99,7 @@ describe('findDiff', () => {
       number: 0,
       date: new Date('2018/12/30'),
     };
+
     const rhs = {
       obj: { a: 'ab' },
       array: ['ab'],
@@ -108,37 +109,41 @@ describe('findDiff', () => {
       date: new Date('2018/11/30'),
     };
 
-    const diffs = findDiff(lhs, rhs, false, (path, key) => ['obj', 'array', 'date'].includes(key));
+    MHD.excludedFields = ['obj', 'array', 'date'];
+    const diffs = MHD.findDiff(lhs, rhs);
     expect(diffs).toEqual([
       { k: 'E', l: 'str', p: ['string'], r: 'str1' },
       { k: 'E', l: 0, p: ['number'], r: 1 },
       { k: 'N', p: ['newString'], r: 'str2' },
     ]);
   });
-  it('prefilter', () => {
-    const lhs = {
-      obj: { a: 'a', b: 'b' },
-      array: ['a', 'b'],
-      string: 'str',
-      number: 0,
-      date: new Date('2018/12/30'),
-    };
-    const rhs = {
-      obj: { a: 'ab' },
-      array: ['ab'],
-      string: 'str1',
-      newString: 'str2',
-      number: 1,
-      date: new Date('2018/11/30'),
-    };
 
-    const diffs = findDiff(lhs, rhs, false, (path, key) => ['obj', 'array', 'date'].includes(key));
-    expect(diffs).toEqual([
-      { k: 'E', l: 'str', p: ['string'], r: 'str1' },
-      { k: 'E', l: 0, p: ['number'], r: 1 },
-      { k: 'N', p: ['newString'], r: 'str2' },
-    ]);
-  });
+  // it('prefilter', () => {
+  //   const lhs = {
+  //     obj: { a: 'a', b: 'b' },
+  //     array: ['a', 'b'],
+  //     string: 'str',
+  //     number: 0,
+  //     date: new Date('2018/12/30'),
+  //   };
+  //   const rhs = {
+  //     obj: { a: 'ab' },
+  //     array: ['ab'],
+  //     string: 'str1',
+  //     newString: 'str2',
+  //     number: 1,
+  //     date: new Date('2018/11/30'),
+  //   };
+
+  //   const diffs = MHD.findDiff(lhs, rhs, false, (path, key) =>
+  //     ['obj', 'array', 'date'].includes(key)
+  //   );
+  //   expect(diffs).toEqual([
+  //     { k: 'E', l: 'str', p: ['string'], r: 'str1' },
+  //     { k: 'E', l: 0, p: ['number'], r: 1 },
+  //     { k: 'N', p: ['newString'], r: 'str2' },
+  //   ]);
+  // });
 
   describe('revertChanges', () => {
     it('editing', () => {

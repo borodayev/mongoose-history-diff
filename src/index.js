@@ -2,17 +2,18 @@
 /* eslint-disable no-param-reassign, func-names */
 
 import type { MongooseSchema } from 'mongoose';
-import { findDiff } from './diff';
+import MHD from './diff';
 import type { DiffModelT, OptionsT, RawChangeT } from './definitions';
 import DiffModel from './DiffModel';
-import { getExcludedFields, excludeFields, type ExcludeFieldT } from './utils';
+import { getExcludedFields } from './utils';
 
 export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) {
   if (!schema.options.versionKey)
     throw new Error(`You must provide 'versionKey' option to your schema or remain it as default`);
 
   const versionKey = schema.options.versionKey;
-  const excludedFields: Array<ExcludeFieldT> = getExcludedFields(schema);
+  MHD.orderIndependent = options?.orderIndependent || false;
+  MHD.excludedFields = getExcludedFields(schema);
 
   // $FlowFixMe
   schema.static('diffModel', function(): DiffModelT {
@@ -31,11 +32,7 @@ export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) 
       const rhs = this.toObject();
       const version = this[versionKey] + 1; // cause we're inside preSave hook
       const Diff: DiffModelT = this.constructor.diffModel();
-      const orderIndep = options?.orderIndepended || false;
-      const diffs: Array<RawChangeT> = (findDiff(lhs, rhs, orderIndep, (path, key) =>
-        excludeFields(path, key, excludedFields)
-      ): any);
-
+      const diffs: Array<RawChangeT> = MHD.findDiff(lhs, rhs);
       if (diffs?.length > 0) await Diff.createDiff(lhs._id, version, diffs);
       this._original = null;
     }
