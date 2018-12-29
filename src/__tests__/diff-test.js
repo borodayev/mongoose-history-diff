@@ -57,41 +57,46 @@ describe('findDiff', () => {
     const lhs = ['a', { b: 1 }];
     const rhs = ['ab', { b: 12, d: ['sd', 'sq'] }];
 
+    MHD.orderIndependent = false;
     const newDiffs = MHD.findDiff([], lhs);
-    const modifiedDiffs = MHD.findDiff(lhs, rhs);
-    const deletedDiffs = MHD.findDiff([1, 2, 3, 4], [1, 2, 4]);
-    const itself = MHD.findDiff(lhs, lhs);
-    const orderIndependent = MHD.findDiff([1, 2, 3], [1, 3, 2], true);
-    const orderIndependentObj = MHD.findDiff(
-      [{ a: 1 }, { a: 2, b: 3 }],
-      [{ a: 2, b: 3 }, { a: 1 }],
-      true
-    );
-    const orderDepended = MHD.findDiff([1, 2, 3], [1, 3, 2], false);
-
     expect(newDiffs).toEqual([
       { i: 1, it: { k: 'N', r: { b: 1 } }, k: 'A', p: [] },
       { i: 0, it: { k: 'N', r: 'a' }, k: 'A', p: [] },
     ]);
+
+    const modifiedDiffs = MHD.findDiff(lhs, rhs);
     expect(modifiedDiffs).toEqual([
       { k: 'E', l: 1, p: ['1', 'b'], r: 12 },
       { k: 'N', p: ['1', 'd'], r: ['sd', 'sq'] },
       { k: 'E', l: 'a', p: ['0'], r: 'ab' },
     ]);
+
+    const deletedDiffs = MHD.findDiff([1, 2, 3, 4], [1, 2, 4]);
     expect(deletedDiffs).toEqual([
       { i: 3, it: { k: 'D', l: 4 }, k: 'A', p: [] },
       { k: 'E', l: 3, p: ['2'], r: 4 },
     ]);
+
+    const itself = MHD.findDiff(lhs, lhs);
+    expect(itself).toEqual([]);
+
+    const orderDepended = MHD.findDiff([1, 2, 3], [1, 3, 2]);
     expect(orderDepended).toEqual([
       { k: 'E', l: 3, p: ['2'], r: 2 },
       { k: 'E', l: 2, p: ['1'], r: 3 },
     ]);
+
+    MHD.orderIndependent = true;
+    const orderIndependent = MHD.findDiff([1, 2, 3], [1, 3, 2]);
     expect(orderIndependent).toEqual([]);
+    const orderIndependentObj = MHD.findDiff(
+      [{ a: 1 }, { a: 2, b: 3 }],
+      [{ a: 2, b: 3 }, { a: 1 }]
+    );
     expect(orderIndependentObj).toEqual([]);
-    expect(itself).toEqual([]);
   });
 
-  it.only('prefilter', () => {
+  it('prefilter', () => {
     const lhs = {
       obj: { a: 'a', b: 'b' },
       array: ['a', 'b'],
@@ -109,7 +114,12 @@ describe('findDiff', () => {
       date: new Date('2018/11/30'),
     };
 
-    MHD.excludedFields = ['obj', 'array', 'date'];
+    MHD.excludedFields = [
+      { key: 'obj', lvl: 0 },
+      { key: 'array', lvl: 0 },
+      { key: 'date', lvl: 0 },
+    ];
+
     const diffs = MHD.findDiff(lhs, rhs);
     expect(diffs).toEqual([
       { k: 'E', l: 'str', p: ['string'], r: 'str1' },
@@ -117,33 +127,6 @@ describe('findDiff', () => {
       { k: 'N', p: ['newString'], r: 'str2' },
     ]);
   });
-
-  // it('prefilter', () => {
-  //   const lhs = {
-  //     obj: { a: 'a', b: 'b' },
-  //     array: ['a', 'b'],
-  //     string: 'str',
-  //     number: 0,
-  //     date: new Date('2018/12/30'),
-  //   };
-  //   const rhs = {
-  //     obj: { a: 'ab' },
-  //     array: ['ab'],
-  //     string: 'str1',
-  //     newString: 'str2',
-  //     number: 1,
-  //     date: new Date('2018/11/30'),
-  //   };
-
-  //   const diffs = MHD.findDiff(lhs, rhs, false, (path, key) =>
-  //     ['obj', 'array', 'date'].includes(key)
-  //   );
-  //   expect(diffs).toEqual([
-  //     { k: 'E', l: 'str', p: ['string'], r: 'str1' },
-  //     { k: 'E', l: 0, p: ['number'], r: 1 },
-  //     { k: 'N', p: ['newString'], r: 'str2' },
-  //   ]);
-  // });
 
   describe('revertChanges', () => {
     it('editing', () => {

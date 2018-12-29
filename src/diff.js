@@ -6,6 +6,7 @@ import {
   getOrderIndependentHash,
   revertArrayChange,
   excludeFields,
+  deepClone,
   type ExcludeFieldT,
 } from './utils';
 import type { RawChangeT } from './definitions';
@@ -37,7 +38,9 @@ export const deepDiff = (
   const currentPath = path ? [...path] : [];
 
   if (key) {
-    if (prefilter && prefilter(currentPath, key)) return;
+    if (prefilter && prefilter(currentPath, key)) {
+      return;
+    }
     currentPath.push(key);
   }
 
@@ -174,7 +177,8 @@ export const deepDiff = (
 };
 
 export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
-  const copyTarget = target?._doc ? { ...target._doc } : { ...target };
+  const copyTarget = target?._doc ? deepClone(target._doc) : deepClone(target);
+
   changes.forEach(change => {
     let it = copyTarget;
     let i;
@@ -211,7 +215,6 @@ export default class MHD {
   static excludedFields: Array<ExcludeFieldT> = [];
 
   static findDiff(lhs: any, rhs: any): Array<RawChangeT> {
-    console.log(`=======================================+>`, this.excludedFields);
     const changes = [];
     deepDiff(lhs, rhs, changes, {
       prefilter: (path, key) => excludeFields(path, key, this.excludedFields),

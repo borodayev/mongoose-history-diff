@@ -159,13 +159,30 @@ CoreMongooseArray [
     post.subjects = [{ name: 'math' }, { name: 'air' }];
     await post.save();
 
-    const Diff = Post.diffModel();
-    const revertedDoc = await Diff.revertToVersion(post, 1);
+    const post2: PostDoc = (await Post.findOne({
+      title: 'updated',
+    }).exec(): any);
+    post2.title = 'updated2';
+    post2.subjects = [{ name: 'math2' }, { name: 'air2' }];
+    await post2.save();
 
-    expect(revertedDoc.__v).toBe(1);
+    const Diff = Post.diffModel();
+    const revertedDoc = await Diff.revertToVersion(post2, 1);
+
+    expect(post2.title).toBe('updated2');
+    expect(post2.subjects).toMatchInlineSnapshot(`
+CoreMongooseArray [
+  Object {
+    "name": "math2",
+  },
+  Object {
+    "name": "air2",
+  },
+]
+`);
     expect(revertedDoc.title).toBe('test');
     expect(revertedDoc.subjects).toMatchInlineSnapshot(`
-CoreMongooseArray [
+Array [
   Object {
     "name": "test",
   },
@@ -173,7 +190,7 @@ CoreMongooseArray [
 `);
   });
 
-  it('mergeDiffs()', async () => {
+  it.only('mergeDiffs()', async () => {
     await Post.create({ title: 'test', subjects: [{ name: 'test' }] });
     const post: PostDoc = (await Post.findOne({ title: 'test' }).exec(): any);
     post.title = 'updated';
@@ -181,7 +198,7 @@ CoreMongooseArray [
     await post.save();
 
     const Diff = Post.diffModel();
-    const a = await Diff.mergeDiffs(post, false);
-    expect(a).toBe();
+    const mergedDiffs = await Diff.mergeDiffs(post);
+    expect(mergedDiffs).toEqual();
   });
 });

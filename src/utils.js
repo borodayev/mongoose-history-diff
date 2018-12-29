@@ -13,6 +13,7 @@ export const excludeFields = (
   key: string,
   excludedFields: Array<ExcludeFieldT>
 ): boolean => {
+  if (['$__', 'isNew', '$init', '$isDocumentArrayElement', '__index'].includes(path)) return true;
   let isFilter = false;
   excludedFields.forEach(field => {
     if (path.length === field.lvl && key === field.key) isFilter = true;
@@ -22,9 +23,9 @@ export const excludeFields = (
 
 export const getExcludedFields = (schema: MongooseSchema<any>): Array<ExcludeFieldT> => {
   const excludedFields: Array<ExcludeFieldT> = [];
+
   Object.values(schema.paths).forEach((value: any) => {
     const { options, path } = value || {};
-
     if (options?.track_diff === false) {
       const splittedPath = path.split('.');
       const lvl = splittedPath.length - 1;
@@ -165,4 +166,8 @@ export const revertArrayChange = (arr: Array<any>, index: number, change: any): 
     }
   }
   return arr;
+};
+
+export const deepClone = (obj: Object): Object => {
+  return JSON.parse(JSON.stringify(obj));
 };

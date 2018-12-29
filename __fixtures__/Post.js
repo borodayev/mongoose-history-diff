@@ -15,10 +15,14 @@ export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
     },
     subjects: [
       {
-        _id: { track_diff: false },
-        name: { type: String, track_diff: false },
+        _id: { type: mongoose.Schema.Types.ObjectId, track_diff: false },
+        name: { type: String },
       },
     ],
+    createdAt: {
+      type: Date,
+      track_diff: false,
+    },
     updatedAt: {
       type: Date,
       track_diff: false,
