@@ -1,7 +1,7 @@
 // @flow
 /* eslint-disable no-await-in-loop */
 
-import type { ObjectId, MongooseModel } from 'mongoose';
+import type { ObjectId, MongooseModel, MongooseDocument } from 'mongoose';
 import MHD, { revertChanges } from './diff';
 
 export type OptionsT = {|
@@ -65,7 +65,7 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
       .exec();
   }
 
-  static async revertToVersion(doc: any, v: number): Promise<any> {
+  static async revertToVersion(doc: Object, v: number): Promise<any> {
     const changes: Array<RawChangeT> = [];
     const diffDocs = (await this.findAfterVersion(doc._id, v): any);
     if (diffDocs?.length === 0) return null;
@@ -74,12 +74,10 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
     return revertedDoc;
   }
 
-  static async mergeDiffs(currentDoc: any): Promise<any> {
+  static async mergeDiffs(doc: MongooseDocument): Promise<any> {
+    const currentDoc = { ...doc.toObject() };
     const initialDoc = await this.revertToVersion(currentDoc, 1);
     if (!initialDoc) return [];
-    const diffs = MHD.findDiff(initialDoc, currentDoc._doc);
-    console.log(diffs);
-
-    return diffs;
+    return MHD.findDiff(initialDoc, currentDoc);
   }
 }
