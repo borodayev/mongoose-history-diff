@@ -190,7 +190,7 @@ Array [
 `);
   });
 
-  it.only('mergeDiffs()', async () => {
+  it('mergeDiffs()', async () => {
     await Post.create({ title: 'test', subjects: [{ name: 'test' }] });
     const post: PostDoc = (await Post.findOne({ title: 'test' }).exec(): any);
     post.title = 'updated';
@@ -199,6 +199,11 @@ Array [
 
     const Diff = Post.diffModel();
     const mergedDiffs = await Diff.mergeDiffs(post);
-    expect(mergedDiffs).toEqual();
+    expect(Array.isArray(mergedDiffs)).toBeTruthy();
+    expect(mergedDiffs).toEqual([
+      { k: 'E', l: 'test', p: ['title'], r: 'updated' },
+      { i: 1, it: { k: 'N', r: { name: 'air' } }, k: 'A', p: ['subjects'] },
+      { k: 'E', l: 'test', p: ['subjects', '0', 'name'], r: 'math' },
+    ]);
   });
 });
