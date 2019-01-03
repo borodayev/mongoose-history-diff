@@ -13,7 +13,7 @@ export const excludeFields = (
   key: string,
   excludedFields: Array<ExcludeFieldT>
 ): boolean => {
-  if (['$__', 'isNew', '$init', '$isDocumentArrayElement', '__index'].includes(path)) return true;
+  if (path.length === 0 && key === '_id') return true;
   let isFilter = false;
   excludedFields.forEach(field => {
     if (path.length === field.lvl && key === field.key) isFilter = true;
