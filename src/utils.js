@@ -169,5 +169,25 @@ export const revertArrayChange = (arr: Array<any>, index: number, change: any): 
 };
 
 export const deepClone = (obj: Object): Object => {
-  return JSON.parse(JSON.stringify(obj));
+  if (realTypeOf(obj) === 'object') {
+    const clone = { ...obj };
+    for (const k in clone) {
+      if (clone.hasOwnProperty(k)) {
+        clone[k] = deepClone(clone[k]);
+      }
+    }
+    return clone;
+  }
+  if (realTypeOf(obj) === 'array') {
+    const clone = [...obj];
+    clone.forEach((v, i) => {
+      clone[i] = deepClone(v);
+    });
+    return clone;
+  }
+  if (realTypeOf(obj) === 'date') {
+    return new Date(obj);
+  }
+
+  return obj;
 };
