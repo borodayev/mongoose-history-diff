@@ -8,6 +8,7 @@ import {
   getOrderIndependentHash,
   arrayRemove,
   revertArrayChange,
+  deepClone,
 } from '../utils';
 
 describe('utils', () => {
@@ -171,5 +172,43 @@ describe('utils', () => {
     expect(revertedDeleted).toEqual([1, 2, 3, 4]);
     expect(revertedEdited).toEqual([1, 2, 3, 5]);
     expect(revertedArray).toEqual([[1, 2], [1, 2]]);
+  });
+
+  it('deepClone()', () => {
+    const obj = {
+      str: '123',
+      num: 123,
+      reg: /123/,
+      arr: [1, 2, 3],
+      date: new Date('2019-01-05'),
+      obj: {
+        a: {
+          b: 1,
+        },
+      },
+    };
+
+    const clone = deepClone(obj);
+    expect(obj).toEqual({
+      arr: [1, 2, 3],
+      date: new Date('2019-01-05T00:00:00.000Z'),
+      num: 123,
+      obj: { a: { b: 1 } },
+      reg: /123/,
+      str: '123',
+    });
+    expect(clone === obj).toBeFalsy();
+    expect(clone).toEqual({
+      arr: [1, 2, 3],
+      date: new Date('2019-01-05T00:00:00.000Z'),
+      num: 123,
+      obj: { a: { b: 1 } },
+      reg: /123/,
+      str: '123',
+    });
+    clone.date = new Date('2019-01-06');
+    clone.obj.a.b = 2;
+    expect(obj.date).toEqual(new Date('2019-01-05T00:00:00.000Z'));
+    expect(obj.obj.a.b).toBe(1);
   });
 });
