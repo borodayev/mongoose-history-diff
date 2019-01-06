@@ -68,13 +68,13 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
   static async revertToVersion(doc: Object, v: number): Promise<any> {
     const changes: Array<RawChangeT> = [];
     const diffDocs = (await this.findAfterVersion(doc._id, v): any);
-    if (diffDocs?.length === 0) return null;
+
+    if (diffDocs.length === 0) return null;
     diffDocs.forEach(d => changes.push(...d.c));
-    const revertedDoc = revertChanges(doc, changes);
-    return revertedDoc;
+    return revertChanges(doc, changes);
   }
 
-  static async mergeDiffs(doc: MongooseDocument): Promise<any> {
+  static async mergeDiffs(doc: MongooseDocument): Promise<Array<RawChangeT>> {
     const currentDoc = { ...doc.toObject() };
     const initialDoc = await this.revertToVersion(currentDoc, 1);
     if (!initialDoc) return [];

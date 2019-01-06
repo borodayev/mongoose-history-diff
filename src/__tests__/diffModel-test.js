@@ -167,7 +167,7 @@ CoreMongooseArray [
     await post2.save();
 
     const Diff = Post.diffModel();
-    const revertedDoc = await Diff.revertToVersion(post2, 1);
+    const revertedDoc = await Diff.revertToVersion(post2.toObject(), 1);
 
     expect(post2.title).toBe('updated2');
     expect(post2.subjects).toMatchInlineSnapshot(`
