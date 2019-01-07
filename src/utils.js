@@ -168,7 +168,7 @@ export const revertArrayChange = (arr: Array<any>, index: number, change: any): 
   return arr;
 };
 
-export const deepClone = (obj: Object): Object => {
+export const deepClone = (obj: any): any => {
   if (realTypeOf(obj) === 'object') {
     const clone = { ...obj };
     for (const k in clone) {
