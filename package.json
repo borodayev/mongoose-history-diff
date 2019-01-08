@@ -2,13 +2,13 @@
   "name": "mongoose-history-diff",
   "main": "lib/index.js",
   "version": "0.0.0-semantically-released",
-  "description": "This is a mongoose plugin to take a diffs of your documents",
+  "description": "Mongoose plugin to take diffs and history of your documents",
   "files": [
     "lib"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/FrankAst/mongoose-dp.git"
+    "url": "https://github.com/FrankAst/mongoose-history-diff.git"
   },
   "keywords": [
     "mongoose-diff",
@@ -22,9 +22,9 @@
     "deep-diff"
   ],
   "bugs": {
-    "url": "https://github.com/FrankAst/mongoose-dp/issues"
+    "url": "https://github.com/FrankAst/mongoose-history-diff/issues"
   },
-  "homepage": "https://github.com/FrankAst/mongoose-dp",
+  "homepage": "https://github.com/FrankAst/mongoose-history-diff",
   "license": "MIT",
   "peerDependencies": {
     "mongoose": "^5.4.2"
@@ -50,7 +50,6 @@
     "eslint-plugin-flowtype": "^3.2.1",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "fetch-mock": "^7.3.0",
     "flow-bin": "^0.89.0",
     "jest": "23.6.0",
     "mongodb-memory-server": "^2.9.1",
