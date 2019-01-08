@@ -15,7 +15,6 @@ before_install:
 before_script: greenkeeper-lockfile-update
 after_script: greenkeeper-lockfile-upload
 script:
-  - yarn add mongoose --peer
   - yarn run test
   - yarn run build
 after_success:
