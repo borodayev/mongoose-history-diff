@@ -32,7 +32,7 @@ import DiffPlugin from 'mongoose-history-diff';
 
  ### Exclude fields
 
- You can exlude document fields from tracking by adding `{ track_diff: false }` property to your field definition inside schema:
+ You can exlude document fields from tracking by adding `{ track_diff: false }` property to your field definition inside the schema:
 
  ```js
  export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
@@ -66,21 +66,21 @@ After adding, plugin will create a diff document with a following shape in separ
 
 ```js
 {
-    _id: 5c33240bd7cce8cba92030aa,
-    dId: 5c25abc9c9a367742cd5341b,
+    _id: '5c33240bd7cce8cba92030aa',
+    dId: '5c25abc9c9a367742cd5341b',
     c : [ 
         {
             p : [ 
-                "lastname"
+                'lastname'
             ],
-            k : "E",
-            l : "borodaev",
-            r : "Borodayev"
+            k : 'E',
+            l : 'borodaev',
+            r : 'Borodayev'
         }
     ],
     v: 4,
-    createdAt: 2019-01-07T10:03:55.933Z,
-    updatedAt: 2019-01-07T10:03:55.933Z,
+    createdAt: '2019-01-07T10:03:55.933Z',
+    updatedAt: '2019-01-07T10:03:55.933Z',
 }
 ```
 
@@ -99,7 +99,7 @@ Diffs are represented as one or more change records. Change records have the fol
 * `i` - when `k === 'A'`, indicates the array index where the change occurred
 * `it` - when `k === 'A'`, contains a nested change record indicating the change that occurred at the array index
 
-Under the hood plugin uses refactored and simplified algorithm of `deep-diff` package, that is why this plugin has similar structure. You can explore that [repo](https://github.com/flitbit/diff) too if you are interested in.
+Under the hood plugin uses refactored and simplified algorithm of `deep-diff` package, that is why this plugin has similar structure of changes. You can explore that [repo](https://github.com/flitbit/diff) too if you are interested in.
 
 
 ## Methods
@@ -111,20 +111,11 @@ const Diff = Post.diffModel();
 ```
 
 This model contains several static methods as well:
-* `findByDocId(_id: ObjectId)` - finds all diffs docs by parent doc `_id`
-* `findAfterVersion(_id: ObjectId, v: number)` - finds all diffs docs by parent doc `_id` after specific version
+* `findByDocId(_id: ObjectId)` - finds all diffs by parent doc `_id`
+* `findAfterVersion(_id: ObjectId, v: number)` - finds all diffs by parent doc `_id` after specific version
 * `findBeforeVersion(_id: ObjectId, v: number)` - finds all diffs docs by parent doc `_id` before specific version
 * `revertToVersion(doc: Object, v: number)` - reverts changes of specific doc to a specific version.
 * `mergeDiffs(doc: MongooseDocument)` - return all diffs between current doc state and initial doc state.
-
-
-
-
-
-
-
-
-
 
 ## Contribution
 
@@ -132,4 +123,4 @@ Feel free to submit pull request. Also, be sure all tests has passed otherwise p
 
 ## License
 
-[MIT](https://github.com/FrankAst/sms-sender/blob/master/LICENSE.md)
+[MIT](https://github.com/FrankAst/mongoose-history-diff/blob/master/LICENSE.md)
