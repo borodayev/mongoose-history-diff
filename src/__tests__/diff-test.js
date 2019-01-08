@@ -31,7 +31,7 @@ describe('findDiff', () => {
       { k: 'N', p: ['string'], r: 'str1' },
       { k: 'N', p: ['newString'], r: 'str2' },
       { k: 'N', p: ['number'], r: 1 },
-      { k: 'N', p: ['date'], r: new Date('2018-11-29T18:00:00.000Z') },
+      { k: 'N', p: ['date'], r: new Date('2018/11/30') },
     ]);
 
     expect(modifiedDiffs).toEqual([
@@ -43,9 +43,9 @@ describe('findDiff', () => {
       { k: 'E', l: 0, p: ['number'], r: 1 },
       {
         k: 'E',
-        l: new Date('2018-12-29T18:00:00.000Z'),
+        l: new Date('2018/12/30'),
         p: ['date'],
-        r: new Date('2018-11-29T18:00:00.000Z'),
+        r: new Date('2018/11/30'),
       },
       { k: 'N', p: ['newString'], r: 'str2' },
     ]);

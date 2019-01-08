@@ -65,12 +65,13 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
       .exec();
   }
 
-  static async revertToVersion(doc: Object, v: number): Promise<any> {
+  static async revertToVersion(d: Object, v: number): Promise<any> {
+    const doc = typeof d.toObject === 'function' ? d.toObject() : d;
     const changes: Array<RawChangeT> = [];
     const diffDocs = (await this.findAfterVersion(doc._id, v): any);
 
     if (diffDocs.length === 0) return null;
-    diffDocs.forEach(d => changes.push(...d.c));
+    diffDocs.forEach(diffDoc => changes.push(...diffDoc.c));
     return revertChanges(doc, changes);
   }
 
