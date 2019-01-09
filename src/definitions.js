@@ -5,14 +5,17 @@ import type { ObjectId, MongooseModel, MongooseDocument } from 'mongoose';
 import MHD, { revertChanges } from './diff';
 
 export type OptionsT = {|
-  diffCollectionName: ?string,
-  orderIndependent: ?boolean,
+  diffCollectionName?: string,
+  orderIndependent?: boolean,
 |};
-
-export type DiffModelT = MongooseModel & typeof DiffDoc;
 
 export type KindT = 'E' | 'N' | 'D' | 'A';
 
+export class ItemDoc /* :: extends Mongoose$Document */ {
+  k: KindT;
+  l: ?any;
+  r: ?any;
+}
 export type RawChangeT = {|
   k: KindT,
   p: Array<string>,
@@ -21,12 +24,6 @@ export type RawChangeT = {|
   i?: number,
   it?: $Shape<ItemDoc>,
 |};
-
-export class ItemDoc /* :: extends Mongoose$Document */ {
-  k: KindT;
-  l: ?any;
-  r: ?any;
-}
 
 export class ChangeDoc /* :: extends Mongoose$Document */ {
   k: KindT;
@@ -82,3 +79,5 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
     return MHD.findDiff(initialDoc, currentDoc);
   }
 }
+
+export type DiffModelT = MongooseModel & typeof DiffDoc;

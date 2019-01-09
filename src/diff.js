@@ -1,5 +1,5 @@
 // @flow
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign, no-plusplus */
 
 import {
   realTypeOf,
@@ -204,7 +204,7 @@ export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
         delete it[change.p[i]];
         break;
       default:
-        '';
+        it[change.p[i]] = {};
     }
   });
   return copyTarget;

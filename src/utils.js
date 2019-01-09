@@ -143,13 +143,12 @@ export const revertArrayChange = (arr: Array<any>, index: number, change: any): 
         delete element[change.p[j]];
         break;
       default:
-        '';
+        return [];
     }
   } else {
     // the array item is different...
     switch (change.k) {
       case 'A':
-        // $FlowFixMe
         revertArrayChange(arr[index], change.i, change.it);
         break;
       case 'D':
@@ -162,7 +161,7 @@ export const revertArrayChange = (arr: Array<any>, index: number, change: any): 
         arr = arrayRemove(arr, index);
         break;
       default:
-        '';
+        arr = [];
     }
   }
   return arr;
@@ -171,6 +170,7 @@ export const revertArrayChange = (arr: Array<any>, index: number, change: any): 
 export const deepClone = (obj: any): any => {
   if (realTypeOf(obj) === 'object') {
     const clone = { ...obj };
+    // eslint-disable-next-line no-restricted-syntax
     for (const k in clone) {
       if (clone.hasOwnProperty(k)) {
         clone[k] = deepClone(clone[k]);
