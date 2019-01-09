@@ -91,7 +91,7 @@ After adding, the plugin will create a diff document with the following shape in
 }
 ```
 
-**Important!** Plugin creates diffs on a `preSave` mongoose hook. That's why all methods which directly operates with MongoDB won't call creating diff.
+**Important!** Plugin creates diffs on a `preSave` mongoose hook. That's why all methods which directly operates with MongoDB won't invoke creating diff. Also, plugin increment `versionKey` in your collection after any modification.
 
 Diffs are represented as one or more change records. Change records have the following structure:
 
