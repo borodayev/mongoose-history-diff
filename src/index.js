@@ -8,6 +8,7 @@ import DiffModel from './DiffModel';
 import { getExcludedFields } from './utils';
 
 export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) {
+  // $FlowFixMe
   if (!schema.options.versionKey)
     throw new Error(`You must provide 'versionKey' option to your schema or remain it as default`);
 
@@ -26,8 +27,8 @@ export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) 
   });
 
   schema.pre('save', async function() {
-    // && this._original
-    if (!this.isNew) {
+    if (!this.isNew && this._original) {
+      await this.increment();
       const lhs = this._original;
       const rhs = this.toObject();
       const version = this[versionKey] + 1; // cause we're inside preSave hook
