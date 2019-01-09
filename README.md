@@ -21,10 +21,9 @@ yarn add mongoose-history-diff
 npm i mongoose-history-diff
 ```
 
- ## Usage
+## Usage
 
-
- ### Add plugin to your schema:
+### Add plugin to your schema:
  ```js
 import DiffPlugin from 'mongoose-history-diff';
  ```
@@ -38,9 +37,9 @@ import DiffPlugin from 'mongoose-history-diff';
 
  `diffCollectionName` option define the name of collection with diffs. If not provided `${parent_collection_name}_diffs` will be used.
 
- ### Exclude fields
+### Exclude fields
 
- You can exlude document fields from tracking by adding `{ track_diff: false }` property to your field definition inside the schema:
+ You can exclude document fields from tracking by adding `{ track_diff: false }` property to your field definition inside the schema:
 
  ```js
  export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
@@ -70,7 +69,7 @@ import DiffPlugin from 'mongoose-history-diff';
 
 ## Track diffs
 
-After adding, plugin will create a diff document with a following shape in separate collection on every changing of your  documents.
+After adding, the plugin will create a diff document with the following shape in a separate collection on every changing of your  documents.
 
 ```js
 {
@@ -107,12 +106,12 @@ Diffs are represented as one or more change records. Change records have the fol
 * `i` - when `k === 'A'`, indicates the array index where the change occurred
 * `it` - when `k === 'A'`, contains a nested change record indicating the change that occurred at the array index
 
-Under the hood plugin uses refactored and simplified algorithm of `deep-diff` package, that is why this plugin has similar structure of changes. You can explore that [repo](https://github.com/flitbit/diff) too if you are interested in.
+Under the hood, the plugin uses refactored and simplified algorithm of `deep-diff` package, that is why this plugin has similar structure of changes. You can explore that [repo](https://github.com/flitbit/diff) too if you are interested in.
 
 
 ## Methods
 
-Also, plugin will add static `diffModel` method that return the model of diff collection.
+Also, the plugin will add a static `diffModel` method that returns the model of diff collection.
 
 ```js
 const Diff = Post.diffModel();
@@ -127,7 +126,7 @@ This model contains several static methods as well:
 
 ## Contribution
 
-Feel free to submit pull request. Also, be sure all tests has passed otherwise pull request won't be merged.
+Feel free to submit a pull request. Also, be sure all tests have passed otherwise pull request won't be merged.
 
 ## License
 
