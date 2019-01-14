@@ -106,19 +106,25 @@ describe('utils', () => {
 
   it('hashThisString()', () => {
     const hash1 = hashThisString('a');
+    const hashNull = hashThisString('[ type: null ; value: ""]');
+    const empty = hashThisString('');
     const hash2 = hashThisString('abc');
     const hash3 = hashThisString('abcsydghcsdagcyasjdcsdvcgsavdgcvsagdcbjhsdbbc');
 
     expect(hash1).toBe(97);
+    expect(empty).toBe(0);
+    expect(hashNull).toBe(1593002687);
     expect(hash2).toBe(96354);
     expect(hash3).toBe(25191889);
   });
 
   it('getOrderIndependentHash()', () => {
     const array = getOrderIndependentHash(['a', 'b']);
+    const ifNull = getOrderIndependentHash(null);
     const obj = getOrderIndependentHash({ a: 'a', b: 'b' });
     const string = getOrderIndependentHash('ab');
 
+    expect(ifNull).toBe(1933772593);
     expect(array).toBe(976844698);
     expect(obj).toBe(-2385456289);
     expect(string).toBe(35072500);

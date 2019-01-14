@@ -65,7 +65,7 @@ export const realTypeOf = (obj: any): string => {
   if (Object.prototype.toString.call(obj) === '[object Date]') {
     return 'date';
   }
-  if (typeof obj.toString === 'function' && /^\/.*\//.test(obj.toString())) {
+  if (typeof obj?.toString === 'function' && /^\/.*\//.test(obj.toString())) {
     return 'regexp';
   }
   return 'object';
@@ -110,7 +110,8 @@ export const getOrderIndependentHash = (obj: any): number => {
     });
     return accum;
   }
-  const stringToHash = `[ type: ${type} ; value: ${obj.toString()}]`;
+
+  const stringToHash = `[ type: ${type} ; value: ${obj ? obj.toString() : 'hash'}]`;
   return accum + hashThisString(stringToHash);
 };
 
