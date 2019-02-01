@@ -36,4 +36,25 @@ describe('mongoose-dp', () => {
     expect(diffs[0].c).toMatchSnapshot();
     expect(diffs[0].v).toBe(1);
   });
+
+  // it('save array diffs properly', async () => {
+  //   await Post.create({ title: 'arrayCheck', subjects: [{ name: 'was' }] });
+  //   const post: PostDoc = (await Post.findOne({ title: 'arrayCheck' }).exec(): any);
+  //   post.subjects = [{ name: 'was' }, { name: 'first' }];
+  //   await post.save();
+
+  //   const post1: PostDoc = (await Post.findOne({ title: 'arrayCheck' }).exec(): any);
+  //   post1.subjects = [{ name: 'was' }, { name: 'first' }, { name: 'second' }];
+  //   await post1.save();
+
+  //   const post2: PostDoc = (await Post.findOne({ title: 'arrayCheck' }).exec(): any);
+  //   post2.subjects = [{ name: 'first' }, { name: 'second' }];
+  //   await post2.save();
+
+  //   const Diff = Post.diffModel();
+  //   const diffs = await Diff.findByDocId(post2._id);
+  //   expect(diffs).toMatchInli
+  //   const merged = await Diff.mergeDiffs(post2);
+  //   expect(merged).toBe();
+  // });
 });
