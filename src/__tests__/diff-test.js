@@ -210,5 +210,81 @@ describe('findDiff', () => {
         string: 'was',
       });
     });
+
+    it('array orderIndepended', () => {
+      MHD.orderIndependent = true;
+      const target = [1, 2, 3, 4];
+
+      const deletedDiffsEnd = MHD.findDiff(target, [1, 2, 3]);
+      const deletedDiffsStart = MHD.findDiff(target, [2, 3, 4]);
+      const deletedDiffsMiddle = MHD.findDiff(target, [1, 3, 4]);
+      const revDeletedEnd = revertChanges([1, 2, 3], deletedDiffsEnd);
+      const revDeletedStart = revertChanges([2, 3, 4], deletedDiffsStart);
+      const revDeletedMiddle = revertChanges([1, 3, 4], deletedDiffsMiddle);
+
+      const addedDiffsEnd = MHD.findDiff(target, [1, 2, 3, 4, 5]);
+      const addedDiffsStart = MHD.findDiff(target, [5, 1, 2, 3, 4]);
+      const addedDiffsMiddle = MHD.findDiff(target, [1, 2, 5, 3, 4]);
+      const revAddedEnd = revertChanges([1, 2, 3, 4, 5], addedDiffsEnd);
+      const revAddedStart = revertChanges([5, 1, 2, 3, 4], addedDiffsStart);
+      const revAddedMiddle = revertChanges([1, 2, 5, 3, 4], addedDiffsMiddle);
+
+      const editedDiffsEnd = MHD.findDiff(target, [1, 2, 3, 5]);
+      const editedDiffsStart = MHD.findDiff(target, [5, 2, 3, 4]);
+      const editedDiffsMiddle = MHD.findDiff(target, [1, 2, 5, 4]);
+      const revEditedEnd = revertChanges([1, 2, 3, 5], editedDiffsEnd);
+      const revEditedStart = revertChanges([5, 2, 3, 4], editedDiffsStart);
+      const revEditedMiddle = revertChanges([1, 2, 5, 4], editedDiffsMiddle);
+
+      expect(revDeletedEnd).toEqual(target);
+      expect(revDeletedStart).toEqual(target);
+      expect(revDeletedMiddle).toEqual(target);
+
+      expect(revAddedEnd).toEqual(target);
+      expect(revAddedStart).toEqual([5, 1, 2, 3]);
+      expect(revAddedMiddle).toEqual([1, 2, 5, 3]);
+
+      expect(revEditedEnd).toEqual(target);
+      expect(revEditedStart).toEqual(target);
+      expect(revEditedMiddle).toEqual(target);
+    });
+
+    it('array !orderIndepended', () => {
+      MHD.orderIndependent = false;
+      const target = [1, 2, 3, 4];
+
+      const deletedDiffsEnd = MHD.findDiff(target, [1, 2, 3]);
+      const deletedDiffsStart = MHD.findDiff(target, [2, 3, 4]);
+      const deletedDiffsMiddle = MHD.findDiff(target, [1, 3, 4]);
+      const revDeletedEnd = revertChanges([1, 2, 3], deletedDiffsEnd);
+      const revDeletedStart = revertChanges([2, 3, 4], deletedDiffsStart);
+      const revDeletedMiddle = revertChanges([1, 3, 4], deletedDiffsMiddle);
+
+      const addedDiffsEnd = MHD.findDiff(target, [1, 2, 3, 4, 5]);
+      const addedDiffsStart = MHD.findDiff(target, [5, 1, 2, 3, 4]);
+      const addedDiffsMiddle = MHD.findDiff(target, [1, 2, 5, 3, 4]);
+      const revAddedEnd = revertChanges([1, 2, 3, 4, 5], addedDiffsEnd);
+      const revAddedStart = revertChanges([5, 1, 2, 3, 4], addedDiffsStart);
+      const revAddedMiddle = revertChanges([1, 2, 5, 3, 4], addedDiffsMiddle);
+
+      const editedDiffsEnd = MHD.findDiff(target, [1, 2, 3, 5]);
+      const editedDiffsStart = MHD.findDiff(target, [5, 2, 3, 4]);
+      const editedDiffsMiddle = MHD.findDiff(target, [1, 2, 5, 4]);
+      const revEditedEnd = revertChanges([1, 2, 3, 5], editedDiffsEnd);
+      const revEditedStart = revertChanges([5, 2, 3, 4], editedDiffsStart);
+      const revEditedMiddle = revertChanges([1, 2, 5, 4], editedDiffsMiddle);
+
+      expect(revDeletedEnd).toEqual(target);
+      expect(revDeletedStart).toEqual(target);
+      expect(revDeletedMiddle).toEqual(target);
+
+      expect(revAddedEnd).toEqual(target);
+      expect(revAddedStart).toEqual(target);
+      expect(revAddedMiddle).toEqual(target);
+
+      expect(revEditedEnd).toEqual(target);
+      expect(revEditedStart).toEqual(target);
+      expect(revEditedMiddle).toEqual(target);
+    });
   });
 });
