@@ -192,6 +192,10 @@ export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
     switch (change.k) {
       case 'A':
         // $FlowFixMe
+        if (Array.isArray(it)) {
+          revertArrayChange(it, change.i, change.it);
+          break;
+        }
         revertArrayChange(it[change.p[i]], change.i, change.it);
         break;
       case 'D':
@@ -211,7 +215,7 @@ export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
 };
 
 export default class MHD {
-  static orderIndependent: boolean = true;
+  static orderIndependent: boolean;
   static excludedFields: Array<ExcludeFieldT> = [];
 
   static findDiff(lhs: any, rhs: any): Array<RawChangeT> {
