@@ -191,12 +191,11 @@ export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
     }
     switch (change.k) {
       case 'A':
-        // $FlowFixMe
         if (Array.isArray(it)) {
-          revertArrayChange(it, change.i, change.it);
+          revertArrayChange(it, parseInt(change.i, 10), change.it);
           break;
         }
-        revertArrayChange(it[change.p[i]], change.i, change.it);
+        revertArrayChange(it[change.p[i]], parseInt(change.i, 10), change.it);
         break;
       case 'D':
         it[change.p[i]] = change.l;
