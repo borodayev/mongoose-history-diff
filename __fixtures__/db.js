@@ -34,6 +34,7 @@ export default class DB {
       opts.autoReconnect = true;
       opts.reconnectTries = Number.MAX_VALUE;
       opts.reconnectInterval = 1000;
+      opts.useNewUrlParser = true;
 
       // $FlowFixMe
       const db: any = DB[name];
@@ -44,10 +45,7 @@ export default class DB {
       db.on('error', e => {
         if (e.message.code === 'ETIMEDOUT') {
           db.consoleErr(Date.now(), e);
-          db.connect(
-            uri,
-            opts
-          );
+          db.connect(uri, opts);
         }
         db.consoleErr(e);
       });
