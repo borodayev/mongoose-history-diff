@@ -30,7 +30,7 @@
     "@babel/runtime": "^7.5.5"
   },
   "peerDependencies": {
-    "mongoose": "^5.4.19"
+    "mongoose": "^5.6.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.5",
@@ -77,14 +77,14 @@
     ]
   },
   "scripts": {
-    "build": "npm run build-cjs && npm run build-flow",
+    "build": "yarn build-cjs && yarn build-flow",
     "build-cjs": "rimraf lib && ./node_modules/.bin/babel src -d lib --ignore './src/__tests__'",
     "build-flow": "find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
     "watch": "jest --watch",
     "coverage": "jest --coverage --maxWorkers 2",
     "lint": "eslint --ext .js ./src",
     "flow": "./node_modules/.bin/flow",
-    "test": "npm run coverage && npm run lint && npm run flow",
+    "test": "yarn coverage && yarn lint && yarn flow",
     "semantic-release": "semantic-release"
   }
 }
