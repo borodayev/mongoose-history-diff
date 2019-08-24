@@ -58,14 +58,14 @@ export const deepDiff = (
     (stack &&
       stack.length > 0 &&
       stack[stack.length - 1].lhs &&
-      Object.getOwnPropertyDescriptor(stack[stack.length - 1].lhs, key));
+      !!Object.getOwnPropertyDescriptor((stack[stack.length - 1].lhs: any), key));
 
   const rdefined =
     !!rhs ||
     (stack &&
       stack.length > 0 &&
       stack[stack.length - 1].rhs &&
-      Object.getOwnPropertyDescriptor(stack[stack.length - 1].rhs, key));
+      !!Object.getOwnPropertyDescriptor((stack[stack.length - 1].rhs: any), key));
 
   if (!ldefined && rdefined) {
     changes.push({ k: 'N', p: currentPath, r: rhs });

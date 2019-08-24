@@ -1,5 +1,5 @@
 // @flow
-/* eslint-disable no-await-in-loop */
+/* eslint-disable no-await-in-loop, max-classes-per-file, import/no-cycle */
 
 import type { ObjectId, MongooseModel, MongooseDocument } from 'mongoose';
 import MHD, { revertChanges } from './diff';

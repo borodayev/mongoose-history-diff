@@ -171,7 +171,7 @@ export const revertArrayChange = (arr: Array<any>, index: number, change: any): 
 export const deepClone = (obj: any): any => {
   if (realTypeOf(obj) === 'object') {
     const clone = { ...obj };
-    // eslint-disable-next-line no-restricted-syntax
+    // eslint-disable-next-line no-restricted-syntax, no-unused-vars
     for (const k in clone) {
       if (clone.hasOwnProperty(k)) {
         clone[k] = deepClone(clone[k]);
