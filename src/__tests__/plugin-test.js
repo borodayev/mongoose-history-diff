@@ -37,24 +37,105 @@ describe('mongoose-dp', () => {
     expect(diffs[0].v).toBe(1);
   });
 
-  // it('save array diffs properly', async () => {
-  //   await Post.create({ title: 'arrayCheck', subjects: [{ name: 'was' }] });
-  //   const post: PostDoc = (await Post.findOne({ title: 'arrayCheck' }).exec(): any);
-  //   post.subjects = [{ name: 'was' }, { name: 'first' }];
-  //   await post.save();
+  describe('save array diffs properly', () => {
+    it('add new element', async () => {
+      await Post.create({ title: 'newElement', subjects: [{ name: 'test' }] });
+      const post: PostDoc = (await Post.findOne({
+        title: 'newElement',
+      }).exec(): any);
+      post.subjects = [{ name: 'test' }, { name: 'new test' }];
+      await post.save();
 
-  //   const post1: PostDoc = (await Post.findOne({ title: 'arrayCheck' }).exec(): any);
-  //   post1.subjects = [{ name: 'was' }, { name: 'first' }, { name: 'second' }];
-  //   await post1.save();
+      const Diff = Post.diffModel();
+      const diffs = await Diff.findByDocId(post._id);
+      expect(diffs[0].c).toMatchInlineSnapshot(`
+        CoreMongooseArray [
+          Object {
+            "i": 1,
+            "it": Object {
+              "k": "N",
+              "r": Object {
+                "name": "new test",
+              },
+            },
+            "k": "A",
+            "p": Array [
+              "subjects",
+            ],
+          },
+        ]
+      `);
+    });
 
-  //   const post2: PostDoc = (await Post.findOne({ title: 'arrayCheck' }).exec(): any);
-  //   post2.subjects = [{ name: 'first' }, { name: 'second' }];
-  //   await post2.save();
+    it('edit existed element', async () => {
+      await Post.create({
+        title: 'existedElement',
+        subjects: [{ name: 'was' }],
+      });
+      const post: PostDoc = (await Post.findOne({
+        title: 'existedElement',
+      }).exec(): any);
+      post.subjects = [{ name: 'become' }];
+      await post.save();
 
-  //   const Diff = Post.diffModel();
-  //   const diffs = await Diff.findByDocId(post2._id);
-  //   expect(diffs).toMatchInli
-  //   const merged = await Diff.mergeDiffs(post2);
-  //   expect(merged).toBe();
-  // });
+      const Diff = Post.diffModel();
+      const diffs = await Diff.findByDocId(post._id);
+      expect(diffs[0].c).toMatchInlineSnapshot(`
+        CoreMongooseArray [
+          Object {
+            "k": "E",
+            "l": "was",
+            "p": Array [
+              "subjects",
+              "0",
+              "name",
+            ],
+            "r": "become",
+          },
+        ]
+      `);
+    });
+
+    it('delete element', async () => {
+      await Post.create({
+        title: 'deleteElement',
+        subjects: [{ name: 'one' }, { name: 'two' }, { name: 'three' }],
+      });
+      const post: PostDoc = (await Post.findOne({
+        title: 'deleteElement',
+      }).exec(): any);
+      post.subjects = [{ name: 'one' }, { name: 'three' }];
+      await post.save();
+
+      const Diff = Post.diffModel();
+      const diffs = await Diff.findByDocId(post._id);
+      expect(diffs[0].c).toMatchInlineSnapshot(`
+        CoreMongooseArray [
+          Object {
+            "i": 2,
+            "it": Object {
+              "k": "D",
+              "l": Object {
+                "name": "three",
+              },
+            },
+            "k": "A",
+            "p": Array [
+              "subjects",
+            ],
+          },
+          Object {
+            "k": "E",
+            "l": "two",
+            "p": Array [
+              "subjects",
+              "1",
+              "name",
+            ],
+            "r": "three",
+          },
+        ]
+      `);
+    });
+  });
 });
