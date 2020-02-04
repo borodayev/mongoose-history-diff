@@ -168,16 +168,26 @@ describe('utils', () => {
     const revertedNew = revertArrayChange([1, 2, 3, 4], 3, { k: 'N', r: 4 });
     const revertedDeleted = revertArrayChange([1, 2, 3], 3, { k: 'D', l: 4 });
     const revertedEdited = revertArrayChange([1, 2, 3, 6], 3, { k: 'E', l: 5, r: 6 });
-    const revertedArray = revertArrayChange([[1, 2], [1, 3]], 1, {
-      k: 'A',
-      i: 1,
-      it: { k: 'E', l: 2, r: 3 },
-    });
+    const revertedArray = revertArrayChange(
+      [
+        [1, 2],
+        [1, 3],
+      ],
+      1,
+      {
+        k: 'A',
+        i: 1,
+        it: { k: 'E', l: 2, r: 3 },
+      }
+    );
 
     expect(revertedNew).toEqual([1, 2, 3]);
     expect(revertedDeleted).toEqual([1, 2, 3, 4]);
     expect(revertedEdited).toEqual([1, 2, 3, 5]);
-    expect(revertedArray).toEqual([[1, 2], [1, 2]]);
+    expect(revertedArray).toEqual([
+      [1, 2],
+      [1, 2],
+    ]);
   });
 
   it('deepClone()', () => {

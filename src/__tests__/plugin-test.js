@@ -49,7 +49,7 @@ describe('mongoose-dp', () => {
       const Diff = Post.diffModel();
       const diffs = await Diff.findByDocId(post._id);
       expect(diffs[0].c).toMatchInlineSnapshot(`
-        CoreMongooseArray [
+        CoreDocumentArray [
           Object {
             "i": 1,
             "it": Object {
@@ -81,7 +81,7 @@ describe('mongoose-dp', () => {
       const Diff = Post.diffModel();
       const diffs = await Diff.findByDocId(post._id);
       expect(diffs[0].c).toMatchInlineSnapshot(`
-        CoreMongooseArray [
+        CoreDocumentArray [
           Object {
             "k": "E",
             "l": "was",
@@ -110,7 +110,7 @@ describe('mongoose-dp', () => {
       const Diff = Post.diffModel();
       const diffs = await Diff.findByDocId(post._id);
       expect(diffs[0].c).toMatchInlineSnapshot(`
-        CoreMongooseArray [
+        CoreDocumentArray [
           Object {
             "i": 2,
             "it": Object {

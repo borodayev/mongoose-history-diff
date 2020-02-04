@@ -39,46 +39,46 @@ describe('Diff', () => {
     expect(diff2.v).toBe(2);
 
     expect(diff1.c).toMatchInlineSnapshot(`
-CoreMongooseArray [
-  Object {
-    "k": "E",
-    "l": "elements",
-    "p": Array [
-      "details",
-      "with",
-      "2",
-    ],
-    "r": "more",
-  },
-  Object {
-    "i": 3,
-    "it": Object {
-      "k": "N",
-      "r": "elements",
-    },
-    "k": "A",
-    "p": Array [
-      "details",
-      "with",
-    ],
-  },
-]
-`);
+      CoreDocumentArray [
+        Object {
+          "k": "E",
+          "l": "elements",
+          "p": Array [
+            "details",
+            "with",
+            "2",
+          ],
+          "r": "more",
+        },
+        Object {
+          "i": 3,
+          "it": Object {
+            "k": "N",
+            "r": "elements",
+          },
+          "k": "A",
+          "p": Array [
+            "details",
+            "with",
+          ],
+        },
+      ]
+    `);
 
     expect(diff2.c).toMatchInlineSnapshot(`
-CoreMongooseArray [
-  Object {
-    "k": "E",
-    "l": "elements",
-    "p": Array [
-      "details",
-      "with",
-      "2",
-    ],
-    "r": "more",
-  },
-]
-`);
+      CoreDocumentArray [
+        Object {
+          "k": "E",
+          "l": "elements",
+          "p": Array [
+            "details",
+            "with",
+            "2",
+          ],
+          "r": "more",
+        },
+      ]
+    `);
   });
 
   it('findAfterVersion()', async () => {
@@ -96,60 +96,60 @@ CoreMongooseArray [
     const tillV1 = await Diff.findAfterVersion(docId, 1);
     const tillV2 = await Diff.findAfterVersion(docId, 2);
     expect(tillV1[0].c).toMatchInlineSnapshot(`
-CoreMongooseArray [
-  Object {
-    "k": "E",
-    "l": "elements",
-    "p": Array [
-      "details",
-      "with",
-      "2",
-    ],
-    "r": "more",
-  },
-]
-`);
+      CoreDocumentArray [
+        Object {
+          "k": "E",
+          "l": "elements",
+          "p": Array [
+            "details",
+            "with",
+            "2",
+          ],
+          "r": "more",
+        },
+      ]
+    `);
     expect(tillV1[1].c).toMatchInlineSnapshot(`
-CoreMongooseArray [
-  Object {
-    "k": "E",
-    "l": "elements",
-    "p": Array [
-      "details",
-      "with",
-      "2",
-    ],
-    "r": "more",
-  },
-  Object {
-    "i": 3,
-    "it": Object {
-      "k": "N",
-      "r": "elements",
-    },
-    "k": "A",
-    "p": Array [
-      "details",
-      "with",
-    ],
-  },
-]
-`);
+      CoreDocumentArray [
+        Object {
+          "k": "E",
+          "l": "elements",
+          "p": Array [
+            "details",
+            "with",
+            "2",
+          ],
+          "r": "more",
+        },
+        Object {
+          "i": 3,
+          "it": Object {
+            "k": "N",
+            "r": "elements",
+          },
+          "k": "A",
+          "p": Array [
+            "details",
+            "with",
+          ],
+        },
+      ]
+    `);
 
     expect(tillV2[0].c).toMatchInlineSnapshot(`
-CoreMongooseArray [
-  Object {
-    "k": "E",
-    "l": "elements",
-    "p": Array [
-      "details",
-      "with",
-      "2",
-    ],
-    "r": "more",
-  },
-]
-`);
+      CoreDocumentArray [
+        Object {
+          "k": "E",
+          "l": "elements",
+          "p": Array [
+            "details",
+            "with",
+            "2",
+          ],
+          "r": "more",
+        },
+      ]
+    `);
   });
 
   it('revertToVersion()', async () => {
@@ -171,15 +171,15 @@ CoreMongooseArray [
 
     expect(post2.title).toBe('updated2');
     expect(post2.subjects).toMatchInlineSnapshot(`
-CoreMongooseArray [
-  Object {
-    "name": "math2",
-  },
-  Object {
-    "name": "air2",
-  },
-]
-`);
+      CoreDocumentArray [
+        Object {
+          "name": "math2",
+        },
+        Object {
+          "name": "air2",
+        },
+      ]
+    `);
     expect(revertedDoc.title).toBe('test');
     expect(revertedDoc.subjects).toMatchInlineSnapshot(`
 Array [
