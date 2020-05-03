@@ -1,12 +1,8 @@
-// @flow
 
-import { Schema, type MongooseConnection } from 'mongoose';
-import { ItemDoc, ChangeDoc, DiffDoc, type DiffModelT } from './definitions';
+import { Schema, MongooseConnection } from 'mongoose';
+import { ItemDoc, ChangeDoc, DiffDoc, DiffModelT } from './definitions';
 
-export default function (
-  mongooseConnection: MongooseConnection,
-  collectionName: string
-): DiffModelT {
+export default function(mongooseConnection: MongooseConnection, collectionName: string): DiffModelT {
   if (!mongooseConnection) throw new Error(`'mongooseConection' is required`);
   if (!collectionName) throw new Error(`'collectionName' is required`);
 
@@ -60,7 +56,7 @@ export default function (
   let Model: DiffModelT;
 
   if (Object.keys(mongooseConnection.models).includes(modelName)) {
-    Model = (mongooseConnection.models[modelName]: any);
+    Model = mongooseConnection.models[modelName] as any;
   } else {
     Model = mongooseConnection.model(modelName, DiffSchema);
   }

@@ -1,18 +1,13 @@
-// @flow
 /* eslint-disable camelcase, no-bitwise, no-param-reassign */
 
-import type { MongooseSchema } from 'mongoose';
+import { MongooseSchema } from 'mongoose';
 
-export type ExcludeFieldT = {|
+export type ExcludeFieldT = {
   key: string,
-  lvl: number,
-|};
+  lvl: number
+};
 
-export const excludeFields = (
-  path: Array<string>,
-  key: string,
-  excludedFields: Array<ExcludeFieldT>
-): boolean => {
+export const excludeFields = (path: Array<string>, key: string, excludedFields: Array<ExcludeFieldT>): boolean => {
   if (path.length === 0 && key === '_id') return true;
   let isFilter = false;
   excludedFields.forEach((field) => {
@@ -26,7 +21,8 @@ export const getExcludedFields = (schema: MongooseSchema<any>): Array<ExcludeFie
 
   Object.values(schema.paths).forEach((value: any) => {
     const { options, path } = value || {};
-    if (options?.track_diff === false) {
+    if (// Auto generated from flowToTs. Please clean me!
+    (options === null || options === undefined ? undefined : options.track_diff) === false) {
       const splittedPath = path.split('.');
       const lvl = splittedPath.length - 1;
       const key = splittedPath[lvl];
@@ -36,7 +32,8 @@ export const getExcludedFields = (schema: MongooseSchema<any>): Array<ExcludeFie
         const aKey = Object.keys(obj)[0];
         const aPath = [path, aKey].join('.');
         const aOptions = obj[aKey];
-        if (aOptions?.track_diff === false) {
+        if (// Auto generated from flowToTs. Please clean me!
+        (aOptions === null || aOptions === undefined ? undefined : aOptions.track_diff) === false) {
           const splittedPath = aPath.split('.');
           const lvl = splittedPath.length;
           const key = splittedPath[lvl - 1];
@@ -65,7 +62,8 @@ export const realTypeOf = (obj: any): string => {
   if (Object.prototype.toString.call(obj) === '[object Date]') {
     return 'date';
   }
-  if (typeof obj?.toString === 'function' && /^\/.*\//.test(obj.toString())) {
+  if (typeof // Auto generated from flowToTs. Please clean me!
+  (obj === null || obj === undefined ? undefined : obj.toString) === 'function' && /^\/.*\//.test(obj.toString())) {
     return 'regexp';
   }
   return 'object';
@@ -115,7 +113,7 @@ export const getOrderIndependentHash = (obj: any): number => {
   return accum + hashThisString(stringToHash);
 };
 
-export const arrayRemove = (arr: Array<any>, from: number, to: ?number): Array<any> => {
+export const arrayRemove = (arr: Array<any>, from: number, to: number | null): Array<any> => {
   const rest = arr.slice((to || from) + 1 || arr.length);
   arr.length = from < 0 ? arr.length + from : from;
   arr.push(...rest);
@@ -123,7 +121,8 @@ export const arrayRemove = (arr: Array<any>, from: number, to: ?number): Array<a
 };
 
 export const revertArrayChange = (arr: Array<any>, index: number, change: any): Array<any> => {
-  if (change?.p?.length) {
+  if (// Auto generated from flowToTs. Please clean me!
+  (change === null || change === undefined ? undefined : change.p) === null || (change === null || change === undefined ? undefined : change.p) === undefined ? undefined : (change === null || change === undefined ? undefined : change.p).length) {
     // the structure of the object at the index has changed...
     let element = arr[index];
     let j;

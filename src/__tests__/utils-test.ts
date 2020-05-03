@@ -1,4 +1,3 @@
-// @flow
 
 import {
   getExcludedFields,
@@ -54,7 +53,7 @@ describe('utils', () => {
     };
 
     const exlFields = getExcludedFields(schema);
-    expect(exlFields).toEqual([
+    expect(exlFields).toStrictEqual([
       { key: 'title', lvl: 0 },
       { key: 'path', lvl: 1 },
       { key: 'pathLvl4', lvl: 4 },
@@ -133,34 +132,60 @@ describe('utils', () => {
   it('arrayRemove()', () => {
     const slicedFrom = arrayRemove(
       [
-        { k: 'A', p: ['details', 'with'], i: 1, it: { k: 'N', r: 'elements1' } },
-        { k: 'A', p: ['details', 'with'], i: 2, it: { k: 'N', r: 'elements2' } },
-        { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements3' } },
-        { k: 'A', p: ['details', 'with'], i: 4, it: { k: 'N', r: 'elements4' } },
+        {
+ k: 'A', p: ['details', 'with'], i: 1, it: { k: 'N', r: 'elements1' },
+},
+        {
+ k: 'A', p: ['details', 'with'], i: 2, it: { k: 'N', r: 'elements2' },
+},
+        {
+ k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements3' },
+},
+        {
+ k: 'A', p: ['details', 'with'], i: 4, it: { k: 'N', r: 'elements4' },
+},
       ],
-      1
+      1,
     );
 
     const slicedFromTo = arrayRemove(
       [
-        { k: 'A', p: ['details', 'with'], i: 1, it: { k: 'N', r: 'elements1' } },
-        { k: 'A', p: ['details', 'with'], i: 2, it: { k: 'N', r: 'elements2' } },
-        { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements3' } },
-        { k: 'A', p: ['details', 'with'], i: 4, it: { k: 'N', r: 'elements4' } },
+        {
+ k: 'A', p: ['details', 'with'], i: 1, it: { k: 'N', r: 'elements1' },
+},
+        {
+ k: 'A', p: ['details', 'with'], i: 2, it: { k: 'N', r: 'elements2' },
+},
+        {
+ k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements3' },
+},
+        {
+ k: 'A', p: ['details', 'with'], i: 4, it: { k: 'N', r: 'elements4' },
+},
       ],
       1,
-      2
+      2,
     );
 
-    expect(slicedFrom).toEqual([
-      { i: 1, it: { k: 'N', r: 'elements1' }, k: 'A', p: ['details', 'with'] },
-      { i: 3, it: { k: 'N', r: 'elements3' }, k: 'A', p: ['details', 'with'] },
-      { i: 4, it: { k: 'N', r: 'elements4' }, k: 'A', p: ['details', 'with'] },
+    expect(slicedFrom).toStrictEqual([
+      {
+ i: 1, it: { k: 'N', r: 'elements1' }, k: 'A', p: ['details', 'with'],
+},
+      {
+ i: 3, it: { k: 'N', r: 'elements3' }, k: 'A', p: ['details', 'with'],
+},
+      {
+ i: 4, it: { k: 'N', r: 'elements4' }, k: 'A', p: ['details', 'with'],
+},
     ]);
 
-    expect(slicedFromTo).toEqual([
-      { i: 1, it: { k: 'N', r: 'elements1' }, k: 'A', p: ['details', 'with'] },
-      { i: 4, it: { k: 'N', r: 'elements4' }, k: 'A', p: ['details', 'with'] },
+    expect(slicedFromTo).toStrictEqual([
+      {
+ i: 1, it: { k: 'N', r: 'elements1' }, k: 'A', p: ['details', 'with'],
+},
+      {
+ i: 4, it: { k: 'N', r: 'elements4' }, k: 'A', p: ['details', 'with'],
+},
     ]);
   });
 
@@ -178,13 +203,13 @@ describe('utils', () => {
         k: 'A',
         i: 1,
         it: { k: 'E', l: 2, r: 3 },
-      }
+      },
     );
 
-    expect(revertedNew).toEqual([1, 2, 3]);
-    expect(revertedDeleted).toEqual([1, 2, 3, 4]);
-    expect(revertedEdited).toEqual([1, 2, 3, 5]);
-    expect(revertedArray).toEqual([
+    expect(revertedNew).toStrictEqual([1, 2, 3]);
+    expect(revertedDeleted).toStrictEqual([1, 2, 3, 4]);
+    expect(revertedEdited).toStrictEqual([1, 2, 3, 5]);
+    expect(revertedArray).toStrictEqual([
       [1, 2],
       [1, 2],
     ]);
@@ -205,7 +230,7 @@ describe('utils', () => {
     };
 
     const clone = deepClone(obj);
-    expect(obj).toEqual({
+    expect(obj).toStrictEqual({
       arr: [1, 2, 3],
       date: new Date('2019-01-05T00:00:00.000Z'),
       num: 123,
@@ -214,7 +239,7 @@ describe('utils', () => {
       str: '123',
     });
     expect(clone === obj).toBeFalsy();
-    expect(clone).toEqual({
+    expect(clone).toStrictEqual({
       arr: [1, 2, 3],
       date: new Date('2019-01-05T00:00:00.000Z'),
       num: 123,
@@ -224,7 +249,7 @@ describe('utils', () => {
     });
     clone.date = new Date('2019-01-06');
     clone.obj.a.b = 2;
-    expect(obj.date).toEqual(new Date('2019-01-05T00:00:00.000Z'));
+    expect(obj.date).toStrictEqual(new Date('2019-01-05T00:00:00.000Z'));
     expect(obj.obj.a.b).toBe(1);
   });
 });

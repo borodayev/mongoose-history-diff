@@ -1,6 +1,5 @@
-// @flow
 
-import { Post, type PostDoc } from '../../__fixtures__/Post';
+import { Post, PostDoc } from '../../__fixtures__/Post';
 
 jest.mock('../../__fixtures__/db.js');
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
@@ -24,7 +23,7 @@ describe('mongoose-dp', () => {
     // need to return doc from db for invoking `init` hook,
     // because there is no sense to save initial doc in diffs
     await Post.create({ title: 'test', subjects: [{ name: 'matsdcsdch' }] });
-    const post: PostDoc = (await Post.findOne({ title: 'test' }).exec(): any);
+    const post: PostDoc = await Post.findOne({ title: 'test' }).exec() as any;
     post.title = 'updated';
     post.subjects = [{ name: 'math' }, { name: 'air' }];
     await post.save();
@@ -40,9 +39,9 @@ describe('mongoose-dp', () => {
   describe('save array diffs properly', () => {
     it('add new element', async () => {
       await Post.create({ title: 'newElement', subjects: [{ name: 'test' }] });
-      const post: PostDoc = (await Post.findOne({
+      const post: PostDoc = await Post.findOne({
         title: 'newElement',
-      }).exec(): any);
+      }).exec() as any;
       post.subjects = [{ name: 'test' }, { name: 'new test' }];
       await post.save();
 
@@ -72,9 +71,9 @@ describe('mongoose-dp', () => {
         title: 'existedElement',
         subjects: [{ name: 'was' }],
       });
-      const post: PostDoc = (await Post.findOne({
+      const post: PostDoc = await Post.findOne({
         title: 'existedElement',
-      }).exec(): any);
+      }).exec() as any;
       post.subjects = [{ name: 'become' }];
       await post.save();
 
@@ -101,9 +100,9 @@ describe('mongoose-dp', () => {
         title: 'deleteElement',
         subjects: [{ name: 'one' }, { name: 'two' }, { name: 'three' }],
       });
-      const post: PostDoc = (await Post.findOne({
+      const post: PostDoc = await Post.findOne({
         title: 'deleteElement',
-      }).exec(): any);
+      }).exec() as any;
       post.subjects = [{ name: 'one' }, { name: 'three' }];
       await post.save();
 

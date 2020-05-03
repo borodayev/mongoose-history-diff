@@ -1,4 +1,3 @@
-// @flow
 /* eslint-disable no-param-reassign, no-plusplus */
 
 import {
@@ -7,31 +6,26 @@ import {
   revertArrayChange,
   excludeFields,
   deepClone,
-  type ExcludeFieldT,
+  ExcludeFieldT,
 } from './utils';
-import type { RawChangeT } from './definitions';
+import { RawChangeT } from './definitions';
 
-export type PrefilterT = (path: Array<string>, key: string) => boolean;
+export type PrefilterT = ((path: Array<string>, key: string) => boolean);
 
-export type StackT = {|
-  lhs: mixed,
-  rhs: mixed,
-|};
+export type StackT = {
+  lhs: unknown,
+  rhs: unknown
+};
 
-export type DeepDiffOptsT = {|
+export type DeepDiffOptsT = {
   prefilter: PrefilterT,
   orderIndependent: boolean,
   key?: string,
   path?: Array<string>,
-  stack?: Array<StackT>,
-|};
+  stack?: Array<StackT>
+};
 
-export const deepDiff = (
-  lhs: any,
-  rhs: any,
-  changes: Array<RawChangeT> = [],
-  opts: DeepDiffOptsT
-): void => {
+export const deepDiff = (lhs: any, rhs: any, changes: Array<RawChangeT> = [], opts: DeepDiffOptsT): void => {
   const { path, prefilter, key, orderIndependent } = opts || {};
   let { stack } = opts || {};
   stack = stack || [];
@@ -53,19 +47,13 @@ export const deepDiff = (
   let j;
   let other;
 
-  const ldefined =
-    !!lhs ||
-    (stack &&
-      stack.length > 0 &&
-      stack[stack.length - 1].lhs &&
-      !!Object.getOwnPropertyDescriptor((stack[stack.length - 1].lhs: any), key));
+  const ldefined = !!lhs || stack &&
+    stack.length > 0 &&
+    stack[stack.length - 1].lhs && !!Object.getOwnPropertyDescriptor(stack[stack.length - 1].lhs as any, key);
 
-  const rdefined =
-    !!rhs ||
-    (stack &&
-      stack.length > 0 &&
-      stack[stack.length - 1].rhs &&
-      !!Object.getOwnPropertyDescriptor((stack[stack.length - 1].rhs: any), key));
+  const rdefined = !!rhs || stack &&
+    stack.length > 0 &&
+    stack[stack.length - 1].rhs && !!Object.getOwnPropertyDescriptor(stack[stack.length - 1].rhs as any, key);
 
   if (!ldefined && rdefined) {
     changes.push({ k: 'N', p: currentPath, r: rhs });
@@ -217,7 +205,7 @@ export default class MHD {
   static orderIndependent: boolean;
   static excludedFields: Array<ExcludeFieldT> = [];
 
-  static findDiff(lhs: any, rhs: any): Array<RawChangeT> {
+  static findDiff function(lhs: any, rhs: any): Array<RawChangeT> {
     const changes = [];
     deepDiff(lhs, rhs, changes, {
       prefilter: (path, key) => excludeFields(path, key, this.excludedFields),
