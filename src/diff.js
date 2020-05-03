@@ -130,7 +130,7 @@ export const deepDiff = (
         const lhsKeys = Object.keys(lhs);
         const rhsKeys = Object.keys(rhs);
 
-        lhsKeys.forEach(lhsKey => {
+        lhsKeys.forEach((lhsKey) => {
           other = rhsKeys.indexOf(lhsKey);
           if (other >= 0) {
             deepDiff(lhs[lhsKey], rhs[lhsKey], changes, {
@@ -152,7 +152,7 @@ export const deepDiff = (
           }
         });
 
-        rhsKeys.forEach(rhsKey => {
+        rhsKeys.forEach((rhsKey) => {
           if (rhsKey) {
             deepDiff(null, rhs[rhsKey], changes, {
               prefilter,
@@ -179,7 +179,7 @@ export const deepDiff = (
 export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
   const copyTarget = deepClone(target);
 
-  changes.forEach(change => {
+  changes.forEach((change) => {
     let it = copyTarget;
     let i;
 

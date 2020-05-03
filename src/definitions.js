@@ -68,7 +68,7 @@ export class DiffDoc /* :: extends Mongoose$Document */ {
     const diffDocs = (await this.findAfterVersion(doc._id, v): any);
 
     if (diffDocs.length === 0) return null;
-    diffDocs.forEach(diffDoc => changes.push(...diffDoc.c));
+    diffDocs.forEach((diffDoc) => changes.push(...diffDoc.c));
     return revertChanges(doc, changes);
   }
 

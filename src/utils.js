@@ -15,7 +15,7 @@ export const excludeFields = (
 ): boolean => {
   if (path.length === 0 && key === '_id') return true;
   let isFilter = false;
-  excludedFields.forEach(field => {
+  excludedFields.forEach((field) => {
     if (path.length === field.lvl && key === field.key) isFilter = true;
   });
   return isFilter;
@@ -32,7 +32,7 @@ export const getExcludedFields = (schema: MongooseSchema<any>): Array<ExcludeFie
       const key = splittedPath[lvl];
       excludedFields.push({ key, lvl });
     } else if (value.instance === 'Array') {
-      value.options.type.forEach(obj => {
+      value.options.type.forEach((obj) => {
         const aKey = Object.keys(obj)[0];
         const aPath = [path, aKey].join('.');
         const aOptions = obj[aKey];
@@ -93,7 +93,7 @@ export const getOrderIndependentHash = (obj: any): number => {
   let accum = 0;
   const type = realTypeOf(obj);
   if (type === 'array') {
-    obj.forEach(item => {
+    obj.forEach((item) => {
       // Addition is commutative so this is order indep
       accum += getOrderIndependentHash(item);
     });
@@ -102,7 +102,7 @@ export const getOrderIndependentHash = (obj: any): number => {
   }
 
   if (type === 'object') {
-    Object.keys(obj).forEach(key => {
+    Object.keys(obj).forEach((key) => {
       const keyValueString = `[ type: object, key: ${key}, value hash: ${getOrderIndependentHash(
         obj[key]
       )}]`;

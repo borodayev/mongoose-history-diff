@@ -17,16 +17,16 @@ export default function plugin(schema: MongooseSchema<any>, options?: OptionsT) 
   MHD.excludedFields = getExcludedFields(schema);
 
   // $FlowFixMe
-  schema.static('diffModel', function(): DiffModelT {
+  schema.static('diffModel', function (): DiffModelT {
     const collectionName = options?.diffCollectionName || `${this.collection.name}_diff`;
     return DiffModel(this.collection.conn, collectionName);
   });
 
-  schema.post('init', function() {
+  schema.post('init', function () {
     this._original = this.toObject();
   });
 
-  schema.pre('save', async function() {
+  schema.pre('save', async function () {
     if (!this.isNew && this._original) {
       await this.increment();
       const lhs = this._original;
