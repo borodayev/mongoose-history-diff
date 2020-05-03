@@ -1,11 +1,11 @@
-# mongoose-history-diff :rocket: :fire:
+# mongoose-history-diff
 
-[![travis build](https://img.shields.io/travis/FrankAst/mongoose-history-diff.svg)](https://travis-ci.org/FrankAst/mongoose-history-diff)
-[![codecov coverage](https://img.shields.io/codecov/c/github/FrankAst/mongoose-history-diff.svg)](https://codecov.io/github/FrankAst/mongoose-history-diff)
-[![](https://img.shields.io/npm/v/mongoose-history-diff.svg)](https://www.npmjs.com/package/@frankast/mongoose-history-diff)
+[![travis build](https://img.shields.io/travis/borodayev/mongoose-history-diff.svg)](https://travis-ci.org/borodayev/mongoose-history-diff)
+[![codecov coverage](https://img.shields.io/codecov/c/github/borodayev/mongoose-history-diff.svg)](https://codecov.io/github/borodayev/mongoose-history-diff)
+[![](https://img.shields.io/npm/v/mongoose-history-diff.svg)](https://www.npmjs.com/package/mongoose-history-diff)
 [![npm](https://img.shields.io/npm/dt/mongoose-history-diff.svg)](http://www.npmtrends.com/mongoose-history-diff)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-[![Greenkeeper badge](https://badges.greenkeeper.io/FrankAst/mongoose-history-diff.svg)](https://greenkeeper.io/)
+[![Greenkeeper badge](https://badges.greenkeeper.io/borodayev/mongoose-history-diff.svg)](https://greenkeeper.io/)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 
@@ -130,4 +130,4 @@ Feel free to submit a pull request. Also, be sure all tests have passed otherwis
 
 ## License
 
-[MIT](https://github.com/FrankAst/mongoose-history-diff/blob/master/LICENSE.md)
+[MIT](https://github.com/borodayev/mongoose-history-diff/blob/master/LICENSE.md)

@@ -8,7 +8,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/FrankAst/mongoose-history-diff.git"
+    "url": "https://github.com/borodayev/mongoose-history-diff.git"
   },
   "keywords": [
     "mongoose-diff",
@@ -22,9 +22,9 @@
     "deep-diff"
   ],
   "bugs": {
-    "url": "https://github.com/FrankAst/mongoose-history-diff/issues"
+    "url": "https://github.com/borodayev/mongoose-history-diff/issues"
   },
-  "homepage": "https://github.com/FrankAst/mongoose-history-diff",
+  "homepage": "https://github.com/borodayev/mongoose-history-diff",
   "license": "MIT",
   "dependencies": {
     "@babel/runtime": "^7.9.6"
