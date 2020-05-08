@@ -1,6 +1,7 @@
-// /* eslint-disable */
-
+/* eslint-disable jest/no-truthy-falsy */
+/* eslint-disable jest/prefer-expect-assertions */
 import MHD, { revertChanges } from '../diff';
+import { RawChangeT } from '../types';
 
 describe('findDiff', () => {
   it('object', () => {
@@ -36,21 +37,36 @@ describe('findDiff', () => {
 
     expect(modifiedDiffs).toStrictEqual([
       {
- k: 'E', l: 'a', p: ['obj', 'a'], r: 'ab',
-},
+        k: 'E',
+        l: 'a',
+        p: ['obj', 'a'],
+        r: 'ab',
+      },
       { k: 'D', l: 'b', p: ['obj', 'b'] },
       {
- i: 1, it: { k: 'D', l: 'b' }, k: 'A', p: ['array'],
-},
+        i: 1,
+        it: { k: 'D', l: 'b' },
+        k: 'A',
+        p: ['array'],
+      },
       {
- k: 'E', l: 'a', p: ['array', '0'], r: 'ab',
-},
+        k: 'E',
+        l: 'a',
+        p: ['array', '0'],
+        r: 'ab',
+      },
       {
- k: 'E', l: 'str', p: ['string'], r: 'str1',
-},
+        k: 'E',
+        l: 'str',
+        p: ['string'],
+        r: 'str1',
+      },
       {
- k: 'E', l: 0, p: ['number'], r: 1,
-},
+        k: 'E',
+        l: 0,
+        p: ['number'],
+        r: 1,
+      },
       {
         k: 'E',
         l: new Date('2018/12/30'),
@@ -59,9 +75,14 @@ describe('findDiff', () => {
       },
       { k: 'N', p: ['newString'], r: 'str2' },
     ]);
-    expect(edited).toStrictEqual([{
- k: 'E', l: 1, p: ['a'], r: 2,
-}]);
+    expect(edited).toStrictEqual([
+      {
+        k: 'E',
+        l: 1,
+        p: ['a'],
+        r: 2,
+      },
+    ]);
     expect(itself).toStrictEqual([]);
   });
 
@@ -73,32 +94,50 @@ describe('findDiff', () => {
     const newDiffs = MHD.findDiff([], lhs);
     expect(newDiffs).toStrictEqual([
       {
- i: 1, it: { k: 'N', r: { b: 1 } }, k: 'A', p: [],
-},
+        i: 1,
+        it: { k: 'N', r: { b: 1 } },
+        k: 'A',
+        p: [],
+      },
       {
- i: 0, it: { k: 'N', r: 'a' }, k: 'A', p: [],
-},
+        i: 0,
+        it: { k: 'N', r: 'a' },
+        k: 'A',
+        p: [],
+      },
     ]);
 
     const modifiedDiffs = MHD.findDiff(lhs, rhs);
     expect(modifiedDiffs).toStrictEqual([
       {
- k: 'E', l: 1, p: ['1', 'b'], r: 12,
-},
+        k: 'E',
+        l: 1,
+        p: ['1', 'b'],
+        r: 12,
+      },
       { k: 'N', p: ['1', 'd'], r: ['sd', 'sq'] },
       {
- k: 'E', l: 'a', p: ['0'], r: 'ab',
-},
+        k: 'E',
+        l: 'a',
+        p: ['0'],
+        r: 'ab',
+      },
     ]);
 
     const deletedDiffs = MHD.findDiff([1, 2, 3, 4], [1, 2, 4]);
     expect(deletedDiffs).toStrictEqual([
       {
- i: 3, it: { k: 'D', l: 4 }, k: 'A', p: [],
-},
+        i: 3,
+        it: { k: 'D', l: 4 },
+        k: 'A',
+        p: [],
+      },
       {
- k: 'E', l: 3, p: ['2'], r: 4,
-},
+        k: 'E',
+        l: 3,
+        p: ['2'],
+        r: 4,
+      },
     ]);
 
     const itself = MHD.findDiff(lhs, lhs);
@@ -107,11 +146,17 @@ describe('findDiff', () => {
     const orderDepended = MHD.findDiff([1, 2, 3], [1, 3, 2]);
     expect(orderDepended).toStrictEqual([
       {
- k: 'E', l: 3, p: ['2'], r: 2,
-},
+        k: 'E',
+        l: 3,
+        p: ['2'],
+        r: 2,
+      },
       {
- k: 'E', l: 2, p: ['1'], r: 3,
-},
+        k: 'E',
+        l: 2,
+        p: ['1'],
+        r: 3,
+      },
     ]);
 
     MHD.orderIndependent = true;
@@ -119,7 +164,7 @@ describe('findDiff', () => {
     expect(orderIndependent).toStrictEqual([]);
     const orderIndependentObj = MHD.findDiff(
       [{ a: 1 }, { a: 2, b: 3 }],
-      [{ a: 2, b: 3 }, { a: 1 }],
+      [{ a: 2, b: 3 }, { a: 1 }]
     );
     expect(orderIndependentObj).toStrictEqual([]);
   });
@@ -151,11 +196,17 @@ describe('findDiff', () => {
     const diffs = MHD.findDiff(lhs, rhs);
     expect(diffs).toStrictEqual([
       {
- k: 'E', l: 'str', p: ['string'], r: 'str1',
-},
+        k: 'E',
+        l: 'str',
+        p: ['string'],
+        r: 'str1',
+      },
       {
- k: 'E', l: 0, p: ['number'], r: 1,
-},
+        k: 'E',
+        l: 0,
+        p: ['number'],
+        r: 1,
+      },
       { k: 'N', p: ['newString'], r: 'str2' },
     ]);
   });
@@ -170,22 +221,37 @@ describe('findDiff', () => {
         date: new Date('2018/12/30'),
       };
 
-      const changes = [
+      const changes: RawChangeT[] = [
         {
- k: 'E', p: ['obj', 'a'], l: 'was', r: 'become',
-},
+          k: 'E',
+          p: ['obj', 'a'],
+          l: 'was',
+          r: 'become',
+        },
         {
- k: 'E', p: ['array', '0'], l: 'was', r: 'become',
-},
+          k: 'E',
+          p: ['array', '0'],
+          l: 'was',
+          r: 'become',
+        },
         {
- k: 'E', p: ['string'], l: 'was', r: 'become',
-},
+          k: 'E',
+          p: ['string'],
+          l: 'was',
+          r: 'become',
+        },
         {
- k: 'E', p: ['number'], l: 1, r: 0,
-},
+          k: 'E',
+          p: ['number'],
+          l: 1,
+          r: 0,
+        },
         {
- k: 'E', p: ['date'], l: new Date('2018/11/30'), r: new Date('2018/12/30'),
-},
+          k: 'E',
+          p: ['date'],
+          l: new Date('2018/11/30'),
+          r: new Date('2018/12/30'),
+        },
       ];
 
       const revertedTarget = revertChanges(target, changes);
@@ -210,11 +276,14 @@ describe('findDiff', () => {
         date: new Date('2018/12/30'),
       };
 
-      const changes = [
+      const changes: RawChangeT[] = [
         { k: 'N', p: ['obj', 'a'], r: 'become' },
         {
- k: 'A', p: ['array'], i: 0, it: { k: 'N', r: 'become' },
-},
+          k: 'A',
+          p: ['array'],
+          i: 0,
+          it: { k: 'N', r: 'become' },
+        },
         { k: 'N', p: ['string'], r: 'become' },
         { k: 'N', p: ['number'], r: 0 },
         { k: 'N', p: ['date'], r: new Date('2018/12/30') },
@@ -233,14 +302,20 @@ describe('findDiff', () => {
         array: [1, 2, 4], // [1, 2, 3, 4]
       };
 
-      const changes = [
+      const changes: RawChangeT[] = [
         { k: 'D', p: ['obj', 'a'], l: 'was' },
         {
- k: 'A', p: ['array'], i: 3, it: { k: 'D', l: 4 },
-},
+          k: 'A',
+          p: ['array'],
+          i: 3,
+          it: { k: 'D', l: 4 },
+        },
         {
- k: 'E', p: ['array', '2'], l: 3, r: 4,
-},
+          k: 'E',
+          p: ['array', '2'],
+          l: 3,
+          r: 4,
+        },
         { k: 'D', p: ['string'], l: 'was' },
         { k: 'D', p: ['number'], l: 0 },
         { k: 'D', p: ['date'], l: new Date('2018/12/30') },

@@ -1,8 +1,9 @@
-
-import { Post, PostDoc } from '../../__fixtures__/Post';
+/* eslint-disable jest/no-truthy-falsy */
+/* eslint-disable jest/prefer-expect-assertions */
+import { Post, IPostDoc } from '../../__fixtures__/Post';
 
 jest.mock('../../__fixtures__/db.js');
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+jest.setTimeout(10000);
 
 describe('mongoose-dp', () => {
   it('return diff model', async () => {
@@ -23,7 +24,9 @@ describe('mongoose-dp', () => {
     // need to return doc from db for invoking `init` hook,
     // because there is no sense to save initial doc in diffs
     await Post.create({ title: 'test', subjects: [{ name: 'matsdcsdch' }] });
-    const post: PostDoc = await Post.findOne({ title: 'test' }).exec() as any;
+    const post: IPostDoc = (await Post.findOne({
+      title: 'test',
+    }).exec()) as any;
     post.title = 'updated';
     post.subjects = [{ name: 'math' }, { name: 'air' }];
     await post.save();
@@ -32,16 +35,16 @@ describe('mongoose-dp', () => {
     const diffs = await Diff.findByDocId(post._id);
 
     expect(Array.isArray(diffs)).toBeTruthy();
-    expect(diffs[0].c).toMatchSnapshot();
+    expect(diffs[0].c).toMatchInlineSnapshot();
     expect(diffs[0].v).toBe(1);
   });
 
   describe('save array diffs properly', () => {
     it('add new element', async () => {
       await Post.create({ title: 'newElement', subjects: [{ name: 'test' }] });
-      const post: PostDoc = await Post.findOne({
+      const post: IPostDoc = (await Post.findOne({
         title: 'newElement',
-      }).exec() as any;
+      }).exec()) as any;
       post.subjects = [{ name: 'test' }, { name: 'new test' }];
       await post.save();
 
@@ -71,9 +74,9 @@ describe('mongoose-dp', () => {
         title: 'existedElement',
         subjects: [{ name: 'was' }],
       });
-      const post: PostDoc = await Post.findOne({
+      const post: IPostDoc = (await Post.findOne({
         title: 'existedElement',
-      }).exec() as any;
+      }).exec()) as any;
       post.subjects = [{ name: 'become' }];
       await post.save();
 
@@ -100,9 +103,9 @@ describe('mongoose-dp', () => {
         title: 'deleteElement',
         subjects: [{ name: 'one' }, { name: 'two' }, { name: 'three' }],
       });
-      const post: PostDoc = await Post.findOne({
+      const post: IPostDoc = (await Post.findOne({
         title: 'deleteElement',
-      }).exec() as any;
+      }).exec()) as any;
       post.subjects = [{ name: 'one' }, { name: 'three' }];
       await post.save();
 

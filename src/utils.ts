@@ -1,13 +1,17 @@
 /* eslint-disable camelcase, no-bitwise, no-param-reassign */
 
-import { MongooseSchema } from 'mongoose';
+import { Schema } from 'mongoose';
 
 export type ExcludeFieldT = {
-  key: string,
-  lvl: number
+  key: string;
+  lvl: number;
 };
 
-export const excludeFields = (path: Array<string>, key: string, excludedFields: Array<ExcludeFieldT>): boolean => {
+export const excludeFields = (
+  path: Array<string>,
+  key: string,
+  excludedFields: Array<ExcludeFieldT>
+): boolean => {
   if (path.length === 0 && key === '_id') return true;
   let isFilter = false;
   excludedFields.forEach((field) => {
@@ -16,24 +20,24 @@ export const excludeFields = (path: Array<string>, key: string, excludedFields: 
   return isFilter;
 };
 
-export const getExcludedFields = (schema: MongooseSchema<any>): Array<ExcludeFieldT> => {
+export const getExcludedFields = (
+  schema: Schema<any>
+): Array<ExcludeFieldT> => {
   const excludedFields: Array<ExcludeFieldT> = [];
 
   Object.values(schema.paths).forEach((value: any) => {
     const { options, path } = value || {};
-    if (// Auto generated from flowToTs. Please clean me!
-    (options === null || options === undefined ? undefined : options.track_diff) === false) {
+    if (options?.track_diff === false) {
       const splittedPath = path.split('.');
       const lvl = splittedPath.length - 1;
       const key = splittedPath[lvl];
       excludedFields.push({ key, lvl });
     } else if (value.instance === 'Array') {
-      value.options.type.forEach((obj) => {
+      value.options.type.forEach((obj: any) => {
         const aKey = Object.keys(obj)[0];
         const aPath = [path, aKey].join('.');
         const aOptions = obj[aKey];
-        if (// Auto generated from flowToTs. Please clean me!
-        (aOptions === null || aOptions === undefined ? undefined : aOptions.track_diff) === false) {
+        if (aOptions?.track_diff) {
           const splittedPath = aPath.split('.');
           const lvl = splittedPath.length;
           const key = splittedPath[lvl - 1];
@@ -62,8 +66,7 @@ export const realTypeOf = (obj: any): string => {
   if (Object.prototype.toString.call(obj) === '[object Date]') {
     return 'date';
   }
-  if (typeof // Auto generated from flowToTs. Please clean me!
-  (obj === null || obj === undefined ? undefined : obj.toString) === 'function' && /^\/.*\//.test(obj.toString())) {
+  if (typeof obj?.toString === 'function' && /^\/.*\//.test(obj.toString())) {
     return 'regexp';
   }
   return 'object';
@@ -75,7 +78,7 @@ export const hashThisString = (str: string): number => {
   if (str.length === 0) {
     return hash;
   }
-  for (let i = 0; i < str.length; i++) {
+  for (let i = 0; i < str.length; i += 1) {
     const char = str.charCodeAt(i);
     hash = (hash << 5) - hash + char;
     hash &= hash; // Convert to 32bit integer
@@ -91,7 +94,7 @@ export const getOrderIndependentHash = (obj: any): number => {
   let accum = 0;
   const type = realTypeOf(obj);
   if (type === 'array') {
-    obj.forEach((item) => {
+    obj.forEach((item: any) => {
       // Addition is commutative so this is order indep
       accum += getOrderIndependentHash(item);
     });
@@ -109,24 +112,33 @@ export const getOrderIndependentHash = (obj: any): number => {
     return accum;
   }
 
-  const stringToHash = `[ type: ${type} ; value: ${obj ? obj.toString() : 'hash'}]`;
+  const stringToHash = `[ type: ${type} ; value: ${
+    obj ? obj.toString() : 'hash'
+  }]`;
   return accum + hashThisString(stringToHash);
 };
 
-export const arrayRemove = (arr: Array<any>, from: number, to: number | null): Array<any> => {
+export const arrayRemove = (
+  arr: Array<any>,
+  from: number,
+  to?: number
+): Array<any> => {
   const rest = arr.slice((to || from) + 1 || arr.length);
   arr.length = from < 0 ? arr.length + from : from;
   arr.push(...rest);
   return arr;
 };
 
-export const revertArrayChange = (arr: Array<any>, index: number, change: any): Array<any> => {
-  if (// Auto generated from flowToTs. Please clean me!
-  (change === null || change === undefined ? undefined : change.p) === null || (change === null || change === undefined ? undefined : change.p) === undefined ? undefined : (change === null || change === undefined ? undefined : change.p).length) {
+export const revertArrayChange = (
+  arr: Array<any>,
+  index: number,
+  change: any
+): Array<any> => {
+  if (change?.p?.length) {
     // the structure of the object at the index has changed...
     let element = arr[index];
     let j;
-    for (j = 0; j < change.p.length - 1; j++) {
+    for (j = 0; j < change.p.length - 1; j += 1) {
       element = element[change.p[j]];
     }
     switch (change.kind) {
@@ -172,7 +184,7 @@ export const deepClone = (obj: any): any => {
     const clone = { ...obj };
     // eslint-disable-next-line no-restricted-syntax, no-unused-vars
     for (const k in clone) {
-      if (clone.hasOwnProperty(k)) {
+      if (Object.prototype.hasOwnProperty.call(clone, k)) {
         clone[k] = deepClone(clone[k]);
       }
     }

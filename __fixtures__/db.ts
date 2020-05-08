@@ -1,8 +1,6 @@
-// @flow
 /* eslint-disable no-console */
 
-import mongoose from 'mongoose';
-import type { MongooseConnection } from 'mongoose';
+import mongoose, { Connection } from 'mongoose';
 
 mongoose.Promise = global.Promise;
 
@@ -14,7 +12,7 @@ export default class DB {
   static consoleLog = console.log;
   static _connectionStr: string;
 
-  static data: MongooseConnection = mongoose.createConnection();
+  static data: Connection = mongoose.createConnection();
 
   static init(connectionStr?: string) {
     if (connectionStr) this._connectionStr = connectionStr;
@@ -25,10 +23,10 @@ export default class DB {
     return Promise.all([DB.closeDB('data')]);
   }
 
-  static openDB(name: DBNames = 'data'): Promise<MongooseConnection> {
+  static openDB(name: DBNames = 'data'): Promise<Connection> {
     return new Promise((resolve, reject) => {
       const uri = process.env.MONGO_CONNECTION_STRING || this._connectionStr;
-      const opts = {};
+      const opts: any = {};
 
       opts.promiseLibrary = global.Promise;
       opts.autoReconnect = true;
@@ -36,13 +34,12 @@ export default class DB {
       opts.reconnectInterval = 1000;
       opts.useNewUrlParser = true;
 
-      // $FlowFixMe
       const db: any = DB[name];
 
       db.consoleErr = DB.consoleErr;
       db.consoleLog = DB.consoleLog;
 
-      db.on('error', e => {
+      db.on('error', (e: any) => {
         if (e.message.code === 'ETIMEDOUT') {
           db.consoleErr(Date.now(), e);
           db.connect(uri, opts);
@@ -64,7 +61,6 @@ export default class DB {
   }
 
   static closeDB(name: DBNames = 'data'): Promise<any> {
-    // $FlowFixMe
     if (DB[name]) {
       return DB[name].close();
     }

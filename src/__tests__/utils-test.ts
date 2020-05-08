@@ -1,4 +1,5 @@
-
+/* eslint-disable jest/no-truthy-falsy */
+/* eslint-disable jest/prefer-expect-assertions */
 import {
   getExcludedFields,
   excludeFields,
@@ -72,8 +73,16 @@ describe('utils', () => {
 
     const isTitle = excludeFields([], 'title', exlFields);
     const isPath = excludeFields(['embedded'], 'path', exlFields);
-    const isLvl4 = excludeFields(['embedded', 'a', 'b', 'c'], 'pathLvl4', exlFields);
-    const arrayExlEmbd = excludeFields(['arrayExcludeEmbedded', '0'], 'name', exlFields);
+    const isLvl4 = excludeFields(
+      ['embedded', 'a', 'b', 'c'],
+      'pathLvl4',
+      exlFields
+    );
+    const arrayExlEmbd = excludeFields(
+      ['arrayExcludeEmbedded', '0'],
+      'name',
+      exlFields
+    );
 
     expect(isTitle).toBeTruthy();
     expect(isPath).toBeTruthy();
@@ -108,7 +117,9 @@ describe('utils', () => {
     const hashNull = hashThisString('[ type: null ; value: ""]');
     const empty = hashThisString('');
     const hash2 = hashThisString('abc');
-    const hash3 = hashThisString('abcsydghcsdagcyasjdcsdvcgsavdgcvsagdcbjhsdbbc');
+    const hash3 = hashThisString(
+      'abcsydghcsdagcyasjdcsdvcgsavdgcvsagdcbjhsdbbc'
+    );
 
     expect(hash1).toBe(97);
     expect(empty).toBe(0);
@@ -133,66 +144,109 @@ describe('utils', () => {
     const slicedFrom = arrayRemove(
       [
         {
- k: 'A', p: ['details', 'with'], i: 1, it: { k: 'N', r: 'elements1' },
-},
+          k: 'A',
+          p: ['details', 'with'],
+          i: 1,
+          it: { k: 'N', r: 'elements1' },
+        },
         {
- k: 'A', p: ['details', 'with'], i: 2, it: { k: 'N', r: 'elements2' },
-},
+          k: 'A',
+          p: ['details', 'with'],
+          i: 2,
+          it: { k: 'N', r: 'elements2' },
+        },
         {
- k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements3' },
-},
+          k: 'A',
+          p: ['details', 'with'],
+          i: 3,
+          it: { k: 'N', r: 'elements3' },
+        },
         {
- k: 'A', p: ['details', 'with'], i: 4, it: { k: 'N', r: 'elements4' },
-},
+          k: 'A',
+          p: ['details', 'with'],
+          i: 4,
+          it: { k: 'N', r: 'elements4' },
+        },
       ],
-      1,
+      1
     );
 
     const slicedFromTo = arrayRemove(
       [
         {
- k: 'A', p: ['details', 'with'], i: 1, it: { k: 'N', r: 'elements1' },
-},
+          k: 'A',
+          p: ['details', 'with'],
+          i: 1,
+          it: { k: 'N', r: 'elements1' },
+        },
         {
- k: 'A', p: ['details', 'with'], i: 2, it: { k: 'N', r: 'elements2' },
-},
+          k: 'A',
+          p: ['details', 'with'],
+          i: 2,
+          it: { k: 'N', r: 'elements2' },
+        },
         {
- k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements3' },
-},
+          k: 'A',
+          p: ['details', 'with'],
+          i: 3,
+          it: { k: 'N', r: 'elements3' },
+        },
         {
- k: 'A', p: ['details', 'with'], i: 4, it: { k: 'N', r: 'elements4' },
-},
+          k: 'A',
+          p: ['details', 'with'],
+          i: 4,
+          it: { k: 'N', r: 'elements4' },
+        },
       ],
       1,
-      2,
+      2
     );
 
     expect(slicedFrom).toStrictEqual([
       {
- i: 1, it: { k: 'N', r: 'elements1' }, k: 'A', p: ['details', 'with'],
-},
+        i: 1,
+        it: { k: 'N', r: 'elements1' },
+        k: 'A',
+        p: ['details', 'with'],
+      },
       {
- i: 3, it: { k: 'N', r: 'elements3' }, k: 'A', p: ['details', 'with'],
-},
+        i: 3,
+        it: { k: 'N', r: 'elements3' },
+        k: 'A',
+        p: ['details', 'with'],
+      },
       {
- i: 4, it: { k: 'N', r: 'elements4' }, k: 'A', p: ['details', 'with'],
-},
+        i: 4,
+        it: { k: 'N', r: 'elements4' },
+        k: 'A',
+        p: ['details', 'with'],
+      },
     ]);
 
     expect(slicedFromTo).toStrictEqual([
       {
- i: 1, it: { k: 'N', r: 'elements1' }, k: 'A', p: ['details', 'with'],
-},
+        i: 1,
+        it: { k: 'N', r: 'elements1' },
+        k: 'A',
+        p: ['details', 'with'],
+      },
       {
- i: 4, it: { k: 'N', r: 'elements4' }, k: 'A', p: ['details', 'with'],
-},
+        i: 4,
+        it: { k: 'N', r: 'elements4' },
+        k: 'A',
+        p: ['details', 'with'],
+      },
     ]);
   });
 
   it('revertArrayChange()', () => {
     const revertedNew = revertArrayChange([1, 2, 3, 4], 3, { k: 'N', r: 4 });
     const revertedDeleted = revertArrayChange([1, 2, 3], 3, { k: 'D', l: 4 });
-    const revertedEdited = revertArrayChange([1, 2, 3, 6], 3, { k: 'E', l: 5, r: 6 });
+    const revertedEdited = revertArrayChange([1, 2, 3, 6], 3, {
+      k: 'E',
+      l: 5,
+      r: 6,
+    });
     const revertedArray = revertArrayChange(
       [
         [1, 2],
@@ -203,7 +257,7 @@ describe('utils', () => {
         k: 'A',
         i: 1,
         it: { k: 'E', l: 2, r: 3 },
-      },
+      }
     );
 
     expect(revertedNew).toStrictEqual([1, 2, 3]);
