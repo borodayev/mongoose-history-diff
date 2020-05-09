@@ -37,7 +37,7 @@ export const getExcludedFields = (
         const aKey = Object.keys(obj)[0];
         const aPath = [path, aKey].join('.');
         const aOptions = obj[aKey];
-        if (aOptions?.track_diff) {
+        if (aOptions?.track_diff === false) {
           const splittedPath = aPath.split('.');
           const lvl = splittedPath.length;
           const key = splittedPath[lvl - 1];

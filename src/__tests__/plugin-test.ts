@@ -2,8 +2,8 @@
 /* eslint-disable jest/prefer-expect-assertions */
 import { Post, IPostDoc } from '../../__fixtures__/Post';
 
-jest.mock('../../__fixtures__/db.js');
-jest.setTimeout(10000);
+jest.mock('../../__fixtures__/db.ts');
+jest.setTimeout(30000);
 
 describe('mongoose-dp', () => {
   it('return diff model', async () => {
@@ -35,7 +35,41 @@ describe('mongoose-dp', () => {
     const diffs = await Diff.findByDocId(post._id);
 
     expect(Array.isArray(diffs)).toBeTruthy();
-    expect(diffs[0].c).toMatchInlineSnapshot();
+    expect(diffs[0].c).toMatchInlineSnapshot(`
+      CoreDocumentArray [
+        Object {
+          "k": "E",
+          "l": "test",
+          "p": Array [
+            "title",
+          ],
+          "r": "updated",
+        },
+        Object {
+          "i": 1,
+          "it": Object {
+            "k": "N",
+            "r": Object {
+              "name": "air",
+            },
+          },
+          "k": "A",
+          "p": Array [
+            "subjects",
+          ],
+        },
+        Object {
+          "k": "E",
+          "l": "matsdcsdch",
+          "p": Array [
+            "subjects",
+            "0",
+            "name",
+          ],
+          "r": "math",
+        },
+      ]
+    `);
     expect(diffs[0].v).toBe(1);
   });
 

@@ -26,30 +26,14 @@
   },
   "homepage": "https://github.com/borodayev/mongoose-history-diff",
   "license": "MIT",
-  "dependencies": {
-    "@babel/runtime": "^7.9.6"
-  },
   "peerDependencies": {
-    "mongoose": "^5.9.11"
+    "mongoose": "^5.9.12"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.6",
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/plugin-proposal-object-rest-spread": "^7.9.6",
-    "@babel/plugin-proposal-optional-chaining": "^7.9.0",
-    "@babel/plugin-transform-flow-strip-types": "^7.9.0",
-    "@babel/plugin-transform-runtime": "^7.9.6",
-    "@babel/preset-env": "^7.9.6",
-    "@babel/preset-flow": "^7.9.0",
     "@types/jest": "^25.2.1",
     "@types/mongoose": "^5.7.15",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
-    "babel-core": "^7.0.0-bridge.0",
-    "babel-eslint": "^10.1.0",
-    "babel-jest": "^25.5.1",
-    "babel-preset-minify": "^0.5.1",
     "cz-conventional-changelog": "^3.1.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-typescript": "^7.2.1",
@@ -61,6 +45,7 @@
     "mongodb-memory-server": "^6.5.2",
     "prettier": "^2.0.5",
     "semantic-release": "^17.0.7",
+    "ts-jest": "^25.5.0",
     "typescript": "^3.8.3"
   },
   "publishConfig": {
@@ -74,21 +59,18 @@
   "jest": {
     "testEnvironment": "node",
     "transform": {
-      "^.+\\.js$": "babel-jest"
+      "^.+\\.ts$": "ts-jest"
     },
     "roots": [
       "<rootDir>/src"
     ]
   },
   "scripts": {
-    "build": "yarn build-cjs && yarn build-flow",
-    "build-cjs": "rimraf lib && ./node_modules/.bin/babel src -d lib --ignore './src/__tests__'",
-    "build-flow": "find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
     "watch": "jest --watch",
     "coverage": "jest --coverage --maxWorkers 2",
-    "lint": "eslint --ext .js ./src",
-    "flow": "./node_modules/.bin/flow",
-    "test": "yarn coverage && yarn lint && yarn flow",
+    "lint": "eslint --ext .ts ./src",
+    "tsc": "./node_modules/.bin/tsc",
+    "test": "yarn coverage && yarn lint",
     "semantic-release": "semantic-release"
   }
 }

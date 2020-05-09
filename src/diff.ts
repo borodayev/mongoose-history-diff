@@ -209,13 +209,15 @@ export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
     }
     switch (change.k) {
       case 'A':
-        if (change?.i) {
-          if (Array.isArray(it)) {
-            revertArrayChange(it, change.i, change.it);
-            break;
-          }
-          revertArrayChange(it[change.p[i]], change.i, change.it);
+        if (Array.isArray(it)) {
+          revertArrayChange(it, parseInt(change.i as any, 10), change.it);
+          break;
         }
+        revertArrayChange(
+          it[change.p[i]],
+          parseInt(change.i as any, 10),
+          change.it
+        );
         break;
       case 'D':
         it[change.p[i]] = change.l;

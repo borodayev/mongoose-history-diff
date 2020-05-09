@@ -5,8 +5,8 @@ import DB from '../../__fixtures__/db';
 import DiffModel from '../DiffModel';
 import { Post, IPostDoc } from '../../__fixtures__/Post';
 
-jest.mock('../../__fixtures__/db.js');
-jest.setTimeout(10000);
+jest.mock('../../__fixtures__/db.ts');
+jest.setTimeout(30000);
 
 describe('diff', () => {
   DB.init();
