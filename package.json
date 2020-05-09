@@ -69,7 +69,7 @@
     "watch": "jest --watch",
     "coverage": "jest --coverage --maxWorkers 2",
     "lint": "eslint --ext .ts ./src",
-    "test": "yarn coverage && yarn lint && yarn tsc --noEmit",
+    "test": "yarn coverage && yarn lint",
     "semantic-release": "semantic-release"
   }
 }
