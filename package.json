@@ -1,11 +1,10 @@
 {
   "name": "mongoose-history-diff",
-  "main": "lib/index.js",
   "version": "0.0.0-semantically-released",
   "description": "Mongoose plugin to take diffs and history of your documents",
-  "files": [
-    "lib"
-  ],
+  "main": "/lib/index.js",
+  "types": "/lib/index.d.ts",
+  "files": ["/lib"],
   "repository": {
     "type": "git",
     "url": "https://github.com/borodayev/mongoose-history-diff.git"
@@ -66,11 +65,11 @@
     ]
   },
   "scripts": {
+    "build": "yarn tsc",
     "watch": "jest --watch",
     "coverage": "jest --coverage --maxWorkers 2",
     "lint": "eslint --ext .ts ./src",
-    "tsc": "./node_modules/.bin/tsc",
-    "test": "yarn coverage && yarn lint",
+    "test": "yarn coverage && yarn lint && yarn tsc --noEmit",
     "semantic-release": "semantic-release"
   }
 }
