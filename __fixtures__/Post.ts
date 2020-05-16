@@ -1,13 +1,13 @@
 // @flow
 /* eslint-disable no-param-reassign, func-names */
 
-import mongoose, { type MongooseSchema } from 'mongoose';
-import DiffPlugin from '../src/index';
+import mongoose, { Schema, Document, Model } from 'mongoose';
+import DiffPlugin, { IDiffModel } from '../src/index';
 import DB from './db';
 
 DB.init();
 
-export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
+export const PostSchema: Schema<IPostDoc> = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -34,15 +34,15 @@ export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
   }
 );
 
-export class PostDoc /* :: extends Mongoose$Document */ {
+export interface IPostDoc extends Document {
   title: string;
   subjects: Array<{ name: string }>;
+}
 
-  // TODO: find out solution for flow to use `DiffModelT` instead of `any`
-  /* :: static diffModel(): any {}  */
+interface IPostModel extends Model<IPostDoc> {
+  diffModel(): IDiffModel;
 }
 
 PostSchema.plugin(DiffPlugin);
-PostSchema.loadClass(PostDoc);
 
-export const Post = DB.data.model('Post', PostSchema);
+export const Post = DB.data.model<IPostDoc, IPostModel>('Post', PostSchema);

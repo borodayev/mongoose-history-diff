@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es5",                          
+    "module": "commonjs",                     
+    "declaration": true,                   
+    "outDir": "lib/",                     
+    "removeComments": true,                
+    "strict": true,                        
+    "noImplicitAny": true,
+    "strictNullChecks": true,            
+    "strictFunctionTypes": true,         
+    "strictBindCallApply": true,          
+    "strictPropertyInitialization": true, 
+    "noImplicitThis": true,               
+    "alwaysStrict": true,                 
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+  },
+  "include": ["src/"],
+  "exclude": ["src/__tests__/**/*"],
+}

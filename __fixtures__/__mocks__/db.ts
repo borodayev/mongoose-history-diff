@@ -1,16 +1,13 @@
+/* eslint-disable no-param-reassign, jest/require-top-level-describe, jest/no-hooks */
 /* eslint-disable no-param-reassign */
-/* @flow */
 
-import MongoMemoryServer from 'mongodb-memory-server';
+import * as m from 'mongodb-memory-server';
 
-// $FlowFixMe
 const DB = require.requireActual('../db').default;
 
-const mongod = new MongoMemoryServer({
-  // debug: true,
-});
+const mongod = new m.MongoMemoryServer({});
 
-DB.autoIndexOnceInDev = opts => {
+DB.autoIndexOnceInDev = (opts: any) => {
   opts.config.autoIndex = false;
 };
 DB.consoleErr = () => {};

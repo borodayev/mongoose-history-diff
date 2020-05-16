@@ -1,6 +1,7 @@
-// /* eslint-disable */
-
+/* eslint-disable jest/no-truthy-falsy */
+/* eslint-disable jest/prefer-expect-assertions */
 import MHD, { revertChanges } from '../diff';
+import { RawChangeT } from '../types';
 
 describe('findDiff', () => {
   it('object', () => {
@@ -25,7 +26,7 @@ describe('findDiff', () => {
     const itself = MHD.findDiff(lhs, lhs);
     const edited = MHD.findDiff({ a: 1 }, { a: 2 });
 
-    expect(newDiffs).toEqual([
+    expect(newDiffs).toStrictEqual([
       { k: 'N', p: ['obj'], r: { a: 'ab' } },
       { k: 'N', p: ['array'], r: ['ab'] },
       { k: 'N', p: ['string'], r: 'str1' },
@@ -34,13 +35,38 @@ describe('findDiff', () => {
       { k: 'N', p: ['date'], r: new Date('2018/11/30') },
     ]);
 
-    expect(modifiedDiffs).toEqual([
-      { k: 'E', l: 'a', p: ['obj', 'a'], r: 'ab' },
+    expect(modifiedDiffs).toStrictEqual([
+      {
+        k: 'E',
+        l: 'a',
+        p: ['obj', 'a'],
+        r: 'ab',
+      },
       { k: 'D', l: 'b', p: ['obj', 'b'] },
-      { i: 1, it: { k: 'D', l: 'b' }, k: 'A', p: ['array'] },
-      { k: 'E', l: 'a', p: ['array', '0'], r: 'ab' },
-      { k: 'E', l: 'str', p: ['string'], r: 'str1' },
-      { k: 'E', l: 0, p: ['number'], r: 1 },
+      {
+        i: 1,
+        it: { k: 'D', l: 'b' },
+        k: 'A',
+        p: ['array'],
+      },
+      {
+        k: 'E',
+        l: 'a',
+        p: ['array', '0'],
+        r: 'ab',
+      },
+      {
+        k: 'E',
+        l: 'str',
+        p: ['string'],
+        r: 'str1',
+      },
+      {
+        k: 'E',
+        l: 0,
+        p: ['number'],
+        r: 1,
+      },
       {
         k: 'E',
         l: new Date('2018/12/30'),
@@ -49,8 +75,15 @@ describe('findDiff', () => {
       },
       { k: 'N', p: ['newString'], r: 'str2' },
     ]);
-    expect(edited).toEqual([{ k: 'E', l: 1, p: ['a'], r: 2 }]);
-    expect(itself).toEqual([]);
+    expect(edited).toStrictEqual([
+      {
+        k: 'E',
+        l: 1,
+        p: ['a'],
+        r: 2,
+      },
+    ]);
+    expect(itself).toStrictEqual([]);
   });
 
   it('array', () => {
@@ -59,41 +92,81 @@ describe('findDiff', () => {
 
     MHD.orderIndependent = false;
     const newDiffs = MHD.findDiff([], lhs);
-    expect(newDiffs).toEqual([
-      { i: 1, it: { k: 'N', r: { b: 1 } }, k: 'A', p: [] },
-      { i: 0, it: { k: 'N', r: 'a' }, k: 'A', p: [] },
+    expect(newDiffs).toStrictEqual([
+      {
+        i: 1,
+        it: { k: 'N', r: { b: 1 } },
+        k: 'A',
+        p: [],
+      },
+      {
+        i: 0,
+        it: { k: 'N', r: 'a' },
+        k: 'A',
+        p: [],
+      },
     ]);
 
     const modifiedDiffs = MHD.findDiff(lhs, rhs);
-    expect(modifiedDiffs).toEqual([
-      { k: 'E', l: 1, p: ['1', 'b'], r: 12 },
+    expect(modifiedDiffs).toStrictEqual([
+      {
+        k: 'E',
+        l: 1,
+        p: ['1', 'b'],
+        r: 12,
+      },
       { k: 'N', p: ['1', 'd'], r: ['sd', 'sq'] },
-      { k: 'E', l: 'a', p: ['0'], r: 'ab' },
+      {
+        k: 'E',
+        l: 'a',
+        p: ['0'],
+        r: 'ab',
+      },
     ]);
 
     const deletedDiffs = MHD.findDiff([1, 2, 3, 4], [1, 2, 4]);
-    expect(deletedDiffs).toEqual([
-      { i: 3, it: { k: 'D', l: 4 }, k: 'A', p: [] },
-      { k: 'E', l: 3, p: ['2'], r: 4 },
+    expect(deletedDiffs).toStrictEqual([
+      {
+        i: 3,
+        it: { k: 'D', l: 4 },
+        k: 'A',
+        p: [],
+      },
+      {
+        k: 'E',
+        l: 3,
+        p: ['2'],
+        r: 4,
+      },
     ]);
 
     const itself = MHD.findDiff(lhs, lhs);
-    expect(itself).toEqual([]);
+    expect(itself).toStrictEqual([]);
 
     const orderDepended = MHD.findDiff([1, 2, 3], [1, 3, 2]);
-    expect(orderDepended).toEqual([
-      { k: 'E', l: 3, p: ['2'], r: 2 },
-      { k: 'E', l: 2, p: ['1'], r: 3 },
+    expect(orderDepended).toStrictEqual([
+      {
+        k: 'E',
+        l: 3,
+        p: ['2'],
+        r: 2,
+      },
+      {
+        k: 'E',
+        l: 2,
+        p: ['1'],
+        r: 3,
+      },
     ]);
 
     MHD.orderIndependent = true;
     const orderIndependent = MHD.findDiff([1, 2, 3], [1, 3, 2]);
-    expect(orderIndependent).toEqual([]);
+    expect(orderIndependent).toStrictEqual([]);
     const orderIndependentObj = MHD.findDiff(
       [{ a: 1 }, { a: 2, b: 3 }],
       [{ a: 2, b: 3 }, { a: 1 }]
     );
-    expect(orderIndependentObj).toEqual([]);
+    expect(orderIndependentObj).toStrictEqual([]);
   });
 
   it('prefilter', () => {
@@ -121,9 +194,19 @@ describe('findDiff', () => {
     ];
 
     const diffs = MHD.findDiff(lhs, rhs);
-    expect(diffs).toEqual([
-      { k: 'E', l: 'str', p: ['string'], r: 'str1' },
-      { k: 'E', l: 0, p: ['number'], r: 1 },
+    expect(diffs).toStrictEqual([
+      {
+        k: 'E',
+        l: 'str',
+        p: ['string'],
+        r: 'str1',
+      },
+      {
+        k: 'E',
+        l: 0,
+        p: ['number'],
+        r: 1,
+      },
       { k: 'N', p: ['newString'], r: 'str2' },
     ]);
   });
@@ -138,19 +221,44 @@ describe('findDiff', () => {
         date: new Date('2018/12/30'),
       };
 
-      const changes = [
-        { k: 'E', p: ['obj', 'a'], l: 'was', r: 'become' },
-        { k: 'E', p: ['array', '0'], l: 'was', r: 'become' },
-        { k: 'E', p: ['string'], l: 'was', r: 'become' },
-        { k: 'E', p: ['number'], l: 1, r: 0 },
-        { k: 'E', p: ['date'], l: new Date('2018/11/30'), r: new Date('2018/12/30') },
+      const changes: RawChangeT[] = [
+        {
+          k: 'E',
+          p: ['obj', 'a'],
+          l: 'was',
+          r: 'become',
+        },
+        {
+          k: 'E',
+          p: ['array', '0'],
+          l: 'was',
+          r: 'become',
+        },
+        {
+          k: 'E',
+          p: ['string'],
+          l: 'was',
+          r: 'become',
+        },
+        {
+          k: 'E',
+          p: ['number'],
+          l: 1,
+          r: 0,
+        },
+        {
+          k: 'E',
+          p: ['date'],
+          l: new Date('2018/11/30'),
+          r: new Date('2018/12/30'),
+        },
       ];
 
       const revertedTarget = revertChanges(target, changes);
 
       // must be immutable
       expect(target === revertedTarget).toBeFalsy();
-      expect(revertedTarget).toEqual({
+      expect(revertedTarget).toStrictEqual({
         array: ['was', 'b'],
         date: new Date('2018/11/30'),
         number: 1,
@@ -168,9 +276,14 @@ describe('findDiff', () => {
         date: new Date('2018/12/30'),
       };
 
-      const changes = [
+      const changes: RawChangeT[] = [
         { k: 'N', p: ['obj', 'a'], r: 'become' },
-        { k: 'A', p: ['array'], i: 0, it: { k: 'N', r: 'become' } },
+        {
+          k: 'A',
+          p: ['array'],
+          i: 0,
+          it: { k: 'N', r: 'become' },
+        },
         { k: 'N', p: ['string'], r: 'become' },
         { k: 'N', p: ['number'], r: 0 },
         { k: 'N', p: ['date'], r: new Date('2018/12/30') },
@@ -180,7 +293,7 @@ describe('findDiff', () => {
 
       // must be immutable
       expect(target === revertedTarget).toBeFalsy();
-      expect(revertedTarget).toEqual({ array: ['b'], obj: { b: 'b' } });
+      expect(revertedTarget).toStrictEqual({ array: ['b'], obj: { b: 'b' } });
     });
 
     it('deleting', () => {
@@ -189,10 +302,20 @@ describe('findDiff', () => {
         array: [1, 2, 4], // [1, 2, 3, 4]
       };
 
-      const changes = [
+      const changes: RawChangeT[] = [
         { k: 'D', p: ['obj', 'a'], l: 'was' },
-        { k: 'A', p: ['array'], i: 3, it: { k: 'D', l: 4 } },
-        { k: 'E', p: ['array', '2'], l: 3, r: 4 },
+        {
+          k: 'A',
+          p: ['array'],
+          i: 3,
+          it: { k: 'D', l: 4 },
+        },
+        {
+          k: 'E',
+          p: ['array', '2'],
+          l: 3,
+          r: 4,
+        },
         { k: 'D', p: ['string'], l: 'was' },
         { k: 'D', p: ['number'], l: 0 },
         { k: 'D', p: ['date'], l: new Date('2018/12/30') },
@@ -202,7 +325,7 @@ describe('findDiff', () => {
 
       // must be immutable
       expect(target === revertedTarget).toBeFalsy();
-      expect(revertedTarget).toEqual({
+      expect(revertedTarget).toStrictEqual({
         array: [1, 2, 3, 4],
         date: new Date('2018/12/30'),
         number: 0,
@@ -236,17 +359,17 @@ describe('findDiff', () => {
       const revEditedStart = revertChanges([5, 2, 3, 4], editedDiffsStart);
       const revEditedMiddle = revertChanges([1, 2, 5, 4], editedDiffsMiddle);
 
-      expect(revDeletedEnd).toEqual(target);
-      expect(revDeletedStart).toEqual(target);
-      expect(revDeletedMiddle).toEqual(target);
+      expect(revDeletedEnd).toStrictEqual(target);
+      expect(revDeletedStart).toStrictEqual(target);
+      expect(revDeletedMiddle).toStrictEqual(target);
 
-      expect(revAddedEnd).toEqual(target);
-      expect(revAddedStart).toEqual([5, 1, 2, 3]);
-      expect(revAddedMiddle).toEqual([1, 2, 5, 3]);
+      expect(revAddedEnd).toStrictEqual(target);
+      expect(revAddedStart).toStrictEqual([5, 1, 2, 3]);
+      expect(revAddedMiddle).toStrictEqual([1, 2, 5, 3]);
 
-      expect(revEditedEnd).toEqual(target);
-      expect(revEditedStart).toEqual(target);
-      expect(revEditedMiddle).toEqual(target);
+      expect(revEditedEnd).toStrictEqual(target);
+      expect(revEditedStart).toStrictEqual(target);
+      expect(revEditedMiddle).toStrictEqual(target);
     });
 
     it('array !orderIndepended', () => {
@@ -274,17 +397,17 @@ describe('findDiff', () => {
       const revEditedStart = revertChanges([5, 2, 3, 4], editedDiffsStart);
       const revEditedMiddle = revertChanges([1, 2, 5, 4], editedDiffsMiddle);
 
-      expect(revDeletedEnd).toEqual(target);
-      expect(revDeletedStart).toEqual(target);
-      expect(revDeletedMiddle).toEqual(target);
+      expect(revDeletedEnd).toStrictEqual(target);
+      expect(revDeletedStart).toStrictEqual(target);
+      expect(revDeletedMiddle).toStrictEqual(target);
 
-      expect(revAddedEnd).toEqual(target);
-      expect(revAddedStart).toEqual(target);
-      expect(revAddedMiddle).toEqual(target);
+      expect(revAddedEnd).toStrictEqual(target);
+      expect(revAddedStart).toStrictEqual(target);
+      expect(revAddedMiddle).toStrictEqual(target);
 
-      expect(revEditedEnd).toEqual(target);
-      expect(revEditedStart).toEqual(target);
-      expect(revEditedMiddle).toEqual(target);
+      expect(revEditedEnd).toStrictEqual(target);
+      expect(revEditedStart).toStrictEqual(target);
+      expect(revEditedMiddle).toStrictEqual(target);
     });
   });
 });

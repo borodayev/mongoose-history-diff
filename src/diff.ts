@@ -1,4 +1,3 @@
-// @flow
 /* eslint-disable no-param-reassign, no-plusplus */
 
 import {
@@ -7,24 +6,24 @@ import {
   revertArrayChange,
   excludeFields,
   deepClone,
-  type ExcludeFieldT,
+  ExcludeFieldT,
 } from './utils';
-import type { RawChangeT } from './definitions';
+import { RawChangeT } from './types';
 
 export type PrefilterT = (path: Array<string>, key: string) => boolean;
 
-export type StackT = {|
-  lhs: mixed,
-  rhs: mixed,
-|};
+export type StackT = {
+  lhs: any;
+  rhs: any;
+};
 
-export type DeepDiffOptsT = {|
-  prefilter: PrefilterT,
-  orderIndependent: boolean,
-  key?: string,
-  path?: Array<string>,
-  stack?: Array<StackT>,
-|};
+export type DeepDiffOptsT = {
+  prefilter: PrefilterT;
+  orderIndependent: boolean;
+  key?: string;
+  path?: Array<string>;
+  stack?: Array<StackT>;
+};
 
 export const deepDiff = (
   lhs: any,
@@ -38,9 +37,7 @@ export const deepDiff = (
   const currentPath = path ? [...path] : [];
 
   if (key) {
-    if (prefilter && prefilter(currentPath, key)) {
-      return;
-    }
+    if (prefilter && prefilter(currentPath, key)) return;
     currentPath.push(key);
   }
 
@@ -54,27 +51,37 @@ export const deepDiff = (
   let other;
 
   const ldefined =
-    !!lhs ||
-    (stack &&
-      stack.length > 0 &&
-      stack[stack.length - 1].lhs &&
-      !!Object.getOwnPropertyDescriptor((stack[stack.length - 1].lhs: any), key));
+    (!!lhs || stack) &&
+    stack.length > 0 &&
+    stack[stack.length - 1].lhs &&
+    key &&
+    !!Object.getOwnPropertyDescriptor(stack[stack.length - 1].lhs, key);
 
   const rdefined =
-    !!rhs ||
-    (stack &&
-      stack.length > 0 &&
-      stack[stack.length - 1].rhs &&
-      !!Object.getOwnPropertyDescriptor((stack[stack.length - 1].rhs: any), key));
+    (!!rhs || stack) &&
+    stack.length > 0 &&
+    stack[stack.length - 1].rhs &&
+    key &&
+    !!Object.getOwnPropertyDescriptor(stack[stack.length - 1].rhs, key);
 
   if (!ldefined && rdefined) {
     changes.push({ k: 'N', p: currentPath, r: rhs });
   } else if (!rdefined && ldefined) {
     changes.push({ k: 'D', p: currentPath, l: lhs });
   } else if (realTypeOf(lhs) !== realTypeOf(rhs)) {
-    changes.push({ k: 'E', p: currentPath, l: lhs, r: rhs });
+    changes.push({
+      k: 'E',
+      p: currentPath,
+      l: lhs,
+      r: rhs,
+    });
   } else if (realTypeOf(lhs) === 'date' && lhs - rhs !== 0) {
-    changes.push({ k: 'E', p: currentPath, l: lhs, r: rhs });
+    changes.push({
+      k: 'E',
+      p: currentPath,
+      l: lhs,
+      r: rhs,
+    });
   } else if (lhs && rhs && typeof lhs === 'object') {
     for (i = stack.length - 1; i > -1; --i) {
       if (stack[i].lhs === lhs) {
@@ -87,13 +94,14 @@ export const deepDiff = (
       if (Array.isArray(lhs)) {
         // If order doesn't matter, we need to sort our arrays
         if (orderIndependent) {
-          lhs.sort((a, b) => {
-            return getOrderIndependentHash(a) - getOrderIndependentHash(b);
-          });
+          lhs.sort(
+            (a, b) => getOrderIndependentHash(a) - getOrderIndependentHash(b)
+          );
 
-          rhs.sort((a, b) => {
-            return getOrderIndependentHash(a) - getOrderIndependentHash(b);
-          });
+          rhs.sort(
+            (a: any, b: any) =>
+              getOrderIndependentHash(a) - getOrderIndependentHash(b)
+          );
         }
         i = rhs.length - 1;
         j = lhs.length - 1;
@@ -140,7 +148,7 @@ export const deepDiff = (
               stack,
               orderIndependent,
             });
-            rhsKeys[other] = null;
+            rhsKeys[other] = '';
           } else {
             deepDiff(lhs[lhsKey], null, changes, {
               prefilter,
@@ -167,11 +175,21 @@ export const deepDiff = (
       stack.length -= 1;
     } else if (lhs !== rhs) {
       // lhs is contains a cycle at this element and it differs from rhs
-      changes.push({ k: 'E', p: currentPath, l: lhs, r: rhs });
+      changes.push({
+        k: 'E',
+        p: currentPath,
+        l: lhs,
+        r: rhs,
+      });
     }
   } else if (lhs !== rhs) {
     if (!(typeof lhs === 'number' && Number.isNaN(lhs) && Number.isNaN(rhs))) {
-      changes.push({ k: 'E', p: currentPath, l: lhs, r: rhs });
+      changes.push({
+        k: 'E',
+        p: currentPath,
+        l: lhs,
+        r: rhs,
+      });
     }
   }
 };
@@ -192,10 +210,14 @@ export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
     switch (change.k) {
       case 'A':
         if (Array.isArray(it)) {
-          revertArrayChange(it, parseInt(change.i, 10), change.it);
+          revertArrayChange(it, parseInt(change.i as any, 10), change.it);
           break;
         }
-        revertArrayChange(it[change.p[i]], parseInt(change.i, 10), change.it);
+        revertArrayChange(
+          it[change.p[i]],
+          parseInt(change.i as any, 10),
+          change.it
+        );
         break;
       case 'D':
         it[change.p[i]] = change.l;
@@ -218,7 +240,7 @@ export default class MHD {
   static excludedFields: Array<ExcludeFieldT> = [];
 
   static findDiff(lhs: any, rhs: any): Array<RawChangeT> {
-    const changes = [];
+    const changes: RawChangeT[] = [];
     deepDiff(lhs, rhs, changes, {
       prefilter: (path, key) => excludeFields(path, key, this.excludedFields),
       orderIndependent: this.orderIndependent,

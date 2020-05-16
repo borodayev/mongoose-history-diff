@@ -1,31 +1,29 @@
-// @flow
-
+/* eslint-disable jest/no-truthy-falsy */
+/* eslint-disable jest/prefer-expect-assertions */
 import mongoose from 'mongoose';
 import DB from '../../__fixtures__/db';
 import DiffModel from '../DiffModel';
-import { Post, type PostDoc } from '../../__fixtures__/Post';
+import { Post, IPostDoc } from '../../__fixtures__/Post';
 
-jest.mock('../../__fixtures__/db.js');
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+jest.mock('../../__fixtures__/db.ts');
+jest.setTimeout(30000);
 
-describe('Diff', () => {
+describe('diff', () => {
   DB.init();
 
   it('create diff model', () => {
     expect(() => {
-      // $FlowFixMe
-      DiffModel(null, {});
+      DiffModel(null as any, 'dsc');
     }).toThrowErrorMatchingInlineSnapshot(`"'mongooseConection' is required"`);
 
     expect(() => {
-      // $FlowFixMe
-      DiffModel({}, null);
+      DiffModel({} as any, '');
     }).toThrowErrorMatchingInlineSnapshot(`"'collectionName' is required"`);
   });
 
   it('createDiff()', async () => {
     const Diff = DiffModel(DB.data, 'diffs');
-    // $FlowFixMe
+
     const docId = mongoose.Types.ObjectId();
     const changes: any = [
       { k: 'E', p: ['details', 'with', '2'], l: 'elements', r: 'more' },
@@ -83,7 +81,7 @@ describe('Diff', () => {
 
   it('findAfterVersion()', async () => {
     const Diff = DiffModel(DB.data, 'diffs');
-    // $FlowFixMe
+
     const docId = mongoose.Types.ObjectId();
     const changes: any = [
       { k: 'E', p: ['details', 'with', '2'], l: 'elements', r: 'more' },
@@ -154,14 +152,16 @@ describe('Diff', () => {
 
   it('revertToVersion()', async () => {
     await Post.create({ title: 'test', subjects: [{ name: 'test' }] });
-    const post: PostDoc = (await Post.findOne({ title: 'test' }).exec(): any);
+    const post: IPostDoc = (await Post.findOne({
+      title: 'test',
+    }).exec()) as any;
     post.title = 'updated';
     post.subjects = [{ name: 'math' }, { name: 'air' }];
     await post.save();
 
-    const post2: PostDoc = (await Post.findOne({
+    const post2: IPostDoc = (await Post.findOne({
       title: 'updated',
-    }).exec(): any);
+    }).exec()) as any;
     post2.title = 'updated2';
     post2.subjects = [{ name: 'math2' }, { name: 'air2' }];
     await post2.save();
@@ -192,7 +192,9 @@ Array [
 
   it('mergeDiffs()', async () => {
     await Post.create({ title: 'test', subjects: [{ name: 'test' }] });
-    const post: PostDoc = (await Post.findOne({ title: 'test' }).exec(): any);
+    const post: IPostDoc = (await Post.findOne({
+      title: 'test',
+    }).exec()) as any;
     post.title = 'updated';
     post.subjects = [{ name: 'math' }, { name: 'air' }];
     await post.save();
@@ -200,7 +202,7 @@ Array [
     const Diff = Post.diffModel();
     const mergedDiffs = await Diff.mergeDiffs(post);
     expect(Array.isArray(mergedDiffs)).toBeTruthy();
-    expect(mergedDiffs).toEqual([
+    expect(mergedDiffs).toStrictEqual([
       { k: 'E', l: 'test', p: ['title'], r: 'updated' },
       { i: 1, it: { k: 'N', r: { name: 'air' } }, k: 'A', p: ['subjects'] },
       { k: 'E', l: 'test', p: ['subjects', '0', 'name'], r: 'math' },
