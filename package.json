@@ -1,7 +1,7 @@
 {
   "name": "mongoose-history-diff",
   "version": "0.0.0-semantically-released",
-  "description": "Mongoose plugin to take diffs and history of your documents",
+  "description": "A mongoose plugin to take diffs and history of your documents",
   "main": "/lib/index.js",
   "types": "/lib/index.d.ts",
   "files": ["/lib"],
@@ -10,6 +10,8 @@
     "url": "https://github.com/borodayev/mongoose-history-diff.git"
   },
   "keywords": [
+    "mongoose-history-diff",
+    "mongoose-diff-history",
     "mongoose-diff",
     "mongoose-diff-plugin",
     "mongoose-history",
