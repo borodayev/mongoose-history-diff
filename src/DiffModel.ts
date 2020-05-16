@@ -7,7 +7,7 @@ export default function (
   mongooseConnection: Connection,
   collectionName: string
 ): IDiffModel {
-  if (!mongooseConnection) throw new Error(`'mongooseConection' is required`);
+  if (!mongooseConnection) throw new Error(`'mongooseConnection' is required`);
   if (!collectionName) throw new Error(`'collectionName' is required`);
 
   const ItemSchema = new Schema(
@@ -49,7 +49,11 @@ export default function (
       c: [ChangeSchema],
       v: Number,
     },
-    { versionKey: false, timestamps: true, collection: collectionName }
+    {
+      versionKey: false,
+      timestamps: { createdAt: true, updatedAt: false },
+      collection: collectionName,
+    }
   );
   DiffSchema.index({ docId: 1, path: 1 });
 

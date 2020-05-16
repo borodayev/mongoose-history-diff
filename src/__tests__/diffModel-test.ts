@@ -14,7 +14,7 @@ describe('diff', () => {
   it('create diff model', () => {
     expect(() => {
       DiffModel(null as any, 'dsc');
-    }).toThrowErrorMatchingInlineSnapshot(`"'mongooseConection' is required"`);
+    }).toThrowErrorMatchingInlineSnapshot(`"'mongooseConnection' is required"`);
 
     expect(() => {
       DiffModel({} as any, '');
@@ -35,6 +35,9 @@ describe('diff', () => {
 
     expect(diff1.v).toBe(1);
     expect(diff2.v).toBe(2);
+
+    expect((diff1 as any).updatedAt).toBeUndefined();
+    expect((diff2 as any).updatedAt).toBeUndefined();
 
     expect(diff1.c).toMatchInlineSnapshot(`
       CoreDocumentArray [
