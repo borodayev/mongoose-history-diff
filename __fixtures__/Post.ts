@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 // @flow
 /* eslint-disable no-param-reassign, func-names */
 
@@ -6,6 +7,16 @@ import DiffPlugin, { IDiffModel } from '../src/index';
 import DB from './db';
 
 DB.init();
+
+export interface IPostDoc extends Document {
+  title: string;
+  subjects: Array<{ name: string }>;
+}
+
+interface IPostModel extends Model<IPostDoc> {
+  diffModel(): IDiffModel;
+  createDifferentSubjects(findObj: string, count: number): Promise<void>;
+}
 
 export const PostSchema: Schema<IPostDoc> = new mongoose.Schema(
   {
@@ -34,14 +45,19 @@ export const PostSchema: Schema<IPostDoc> = new mongoose.Schema(
   }
 );
 
-export interface IPostDoc extends Document {
-  title: string;
-  subjects: Array<{ name: string }>;
-}
-
-interface IPostModel extends Model<IPostDoc> {
-  diffModel(): IDiffModel;
-}
+// for test purposes
+PostSchema.statics.createDifferentSubjects = async function (
+  title: string,
+  count: number
+): Promise<void> {
+  for (let i = 1; i <= count; i += 1) {
+    const post: IPostDoc = await this.findOne({ title }).exec();
+    if (post) {
+      post.subjects.push({ name: `name_${i}` });
+      await post.save();
+    }
+  }
+};
 
 PostSchema.plugin(DiffPlugin);
 
