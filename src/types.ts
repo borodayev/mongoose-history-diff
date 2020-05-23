@@ -11,6 +11,11 @@ export type OptionsT = {
 
 export type KindT = 'E' | 'N' | 'D' | 'A';
 
+export type MergedDiffsOptsT = {
+  startVersion?: number;
+  endVersion?: number;
+};
+
 interface ItemDoc {
   k: KindT;
   l?: any;
@@ -53,5 +58,8 @@ export interface IDiffModel extends Model<IDiffDoc> {
 
   revertToVersion(d: Object, v: number): Promise<any>;
 
-  mergeDiffs(doc: Document): Promise<Array<RawChangeT>>;
+  mergeDiffs(
+    doc: Document,
+    opts?: MergedDiffsOptsT
+  ): Promise<Array<RawChangeT>>;
 }
