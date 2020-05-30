@@ -15,6 +15,7 @@
     "alwaysStrict": true,                 
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "typeRoots": [ "./types", "./node_modules/@types"]
   },
-  "include": ["./src/"],
+  "include": ["./src/", "types"],
 }
