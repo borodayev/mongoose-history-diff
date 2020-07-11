@@ -481,5 +481,33 @@ describe('diff', () => {
         `"\\"endVersion\\" argument should be >= 1, but got: 0"`
       );
     });
+
+    it('non-array change', async () => {
+      await Post.create({ title: 'oldTitle', subjects: [] });
+      const post = (await Post.findOne({
+        title: 'oldTitle',
+      }).exec()) as IPostDoc;
+      post.title = 'oldTitle1';
+      await post.save();
+      const post2 = (await Post.findOne({
+        title: 'oldTitle1',
+      }).exec()) as IPostDoc;
+      post2.title = 'oldTitle2';
+      await post2.save();
+      const post3 = (await Post.findOne({
+        title: 'oldTitle2',
+      }).exec()) as IPostDoc;
+      post3.title = 'oldTitle3';
+      await post3.save();
+
+      const Diff = Post.diffModel();
+      const allDiffs = await Diff.mergeDiffs(post3, {
+        startVersion: 2,
+        endVersion: 3,
+      });
+      expect(allDiffs).toStrictEqual([
+        { k: 'E', l: 'oldTitle1', p: ['title'], r: 'oldTitle2' },
+      ]);
+    });
   });
 });
