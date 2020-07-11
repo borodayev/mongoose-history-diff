@@ -7,7 +7,7 @@ import schema from './schema';
 const PORT = process.env.PORT || 8090;
 const server = express();
 
-server.use('/api', graphqlHTTP({
+server.use('/', graphqlHTTP({
   schema: schema,
   graphiql: true,
 }));
