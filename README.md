@@ -1,6 +1,6 @@
 # mongoose-history-diff
 
-[![travis build](https://img.shields.io/travis/borodayev/mongoose-history-diff.svg)](https://travis-ci.org/borodayev/mongoose-history-diff)
+[![travis build](https://img.shields.io/travis/borodayev/mongoose-history-diff.svg)](https://travis-ci.com/borodayev/mongoose-history-diff)
 [![codecov coverage](https://img.shields.io/codecov/c/github/borodayev/mongoose-history-diff.svg)](https://codecov.io/github/borodayev/mongoose-history-diff)
 [![](https://img.shields.io/npm/v/mongoose-history-diff.svg)](https://www.npmjs.com/package/mongoose-history-diff)
 [![npm](https://img.shields.io/npm/dt/mongoose-history-diff.svg)](http://www.npmtrends.com/mongoose-history-diff)
