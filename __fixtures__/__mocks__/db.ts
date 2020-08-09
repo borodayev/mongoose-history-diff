@@ -3,7 +3,7 @@
 
 import * as m from 'mongodb-memory-server';
 
-const DB = require.requireActual('../db').default;
+const DB = jest.requireActual('../db').default;
 
 const mongod = new m.MongoMemoryServer({});
 

@@ -237,6 +237,7 @@ export const revertChanges = (target: any, changes: Array<RawChangeT>): any => {
 
 export default class MHD {
   static orderIndependent: boolean;
+
   static excludedFields: Array<ExcludeFieldT> = [];
 
   static findDiff(lhs: any, rhs: any): Array<RawChangeT> {

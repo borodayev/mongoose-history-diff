@@ -2,9 +2,11 @@
   "name": "mongoose-history-diff",
   "version": "0.0.0-semantically-released",
   "description": "A mongoose plugin to take diffs and history of your documents",
-  "main": "/lib/index.js",
-  "types": "/lib/index.d.ts",
-  "files": ["/lib"],
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "./lib"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/borodayev/mongoose-history-diff.git"
@@ -28,26 +30,27 @@
   "homepage": "https://github.com/borodayev/mongoose-history-diff",
   "license": "MIT",
   "peerDependencies": {
-    "mongoose": "^5.9.12"
+    "mongoose": "^5.9.28"
   },
   "devDependencies": {
-    "@types/jest": "^25.2.1",
-    "@types/mongoose": "^5.7.15",
-    "@typescript-eslint/eslint-plugin": "^2.30.0",
-    "@typescript-eslint/parser": "^2.30.0",
-    "cz-conventional-changelog": "^3.1.0",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-typescript": "^7.2.1",
+    "@semantic-release/commit-analyzer": "^8.0.1",
+    "@types/jest": "^26.0.9",
+    "@types/mongoose": "^5.7.36",
+    "@typescript-eslint/eslint-plugin": "^3.8.0",
+    "@typescript-eslint/parser": "^3.8.0",
+    "cz-conventional-changelog": "^3.2.0",
+    "eslint": "^7.6.0",
+    "eslint-config-airbnb-typescript": "^9.0.0",
     "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-jest": "^23.8.2",
-    "eslint-plugin-prettier": "^3.1.3",
-    "jest": "25.5.4",
-    "mongodb-memory-server": "^6.5.2",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.20.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "jest": "26.2.2",
+    "mongodb-memory-server": "^6.6.3",
     "prettier": "^2.0.5",
-    "semantic-release": "^17.0.7",
-    "ts-jest": "^25.5.0",
-    "typescript": "^3.8.3"
+    "semantic-release": "^17.1.1",
+    "ts-jest": "^26.1.4",
+    "typescript": "^3.9.7"
   },
   "publishConfig": {
     "access": "public"
@@ -56,6 +59,31 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "release": {
+    "branches": [
+      "master"
+    ],
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "preset": "angular",
+          "releaseRules": [
+            {
+              "type": "docs",
+              "scope": "README",
+              "release": "patch"
+            },
+            {
+              "type": "refactor",
+              "release": "patch"
+            }
+          ]
+        }
+      ],
+      "@semantic-release/release-notes-generator"
+    ]
   },
   "jest": {
     "testEnvironment": "node",
