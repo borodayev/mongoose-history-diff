@@ -4,9 +4,7 @@
   "description": "A mongoose plugin to take diffs and history of your documents",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
-  "files": [
-    "./lib"
-  ],
+  "files": ["/lib"],
   "repository": {
     "type": "git",
     "url": "https://github.com/borodayev/mongoose-history-diff.git"
