@@ -33,7 +33,6 @@
     "mongoose": "^5.9.28"
   },
   "devDependencies": {
-    "@semantic-release/commit-analyzer": "^8.0.1",
     "@types/jest": "^26.0.9",
     "@types/mongoose": "^5.7.36",
     "@typescript-eslint/eslint-plugin": "^3.8.0",
@@ -59,31 +58,6 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
-  },
-  "release": {
-    "branches": [
-      "master"
-    ],
-    "plugins": [
-      [
-        "@semantic-release/commit-analyzer",
-        {
-          "preset": "angular",
-          "releaseRules": [
-            {
-              "type": "docs",
-              "scope": "README",
-              "release": "patch"
-            },
-            {
-              "type": "refactor",
-              "release": "patch"
-            }
-          ]
-        }
-      ],
-      "@semantic-release/release-notes-generator"
-    ]
   },
   "jest": {
     "testEnvironment": "node",
