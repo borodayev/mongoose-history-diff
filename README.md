@@ -9,7 +9,7 @@
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 
-This is a [mongoose](https://mongoosejs.com/) plugin for tracking history and differences of your docs.
+This is a [mongoose](https://mongoosejs.com/) plugin for tracking the history and differences of your MongoDB documents. The differences related to one particular model will be stored in a separate MongoDB collection.
 
 ## Installation
 
@@ -23,110 +23,141 @@ npm i mongoose-history-diff
 
 ## Usage
 
-### Add plugin to your schema:
+Add plugin to your Mongoose schema:
+
  ```js
 import DiffPlugin from 'mongoose-history-diff';
  ```
  ```js
- PostSchema.plugin(DiffPlugin, {
+ CoderSchema.plugin(DiffPlugin, {
      orderIndependent: true,
      diffCollectionName: 'my_diffs', 
  });
  ```
- `orderIndependent` option define whether the order of array elements is important or not. If `true` then it won't create a new diff. By default **false**.
+ `orderIndependent` option defines whether the order of elements in an array is important or not. If `true` then it won't create a new diff in case new changes occurred. By default **false**.
 
- `diffCollectionName` option define the name of collection with diffs. If not provided `${parent_collection_name}_diffs` will be used.
+ `diffCollectionName` option sets the name of a collection with diffs. If not provided `${parent_collection_name}_diffs` will be used.
 
-### Exclude fields
+ ---
 
- You can exclude document fields from tracking by adding `{ track_diff: false }` property to your field definition inside the schema:
+Here is an example of how would look a diff doc after changing a string field:
+
+```js
+// initial state
+{
+  _id: "5f8c17fabb207f0017164033",
+  name: "John Doe",
+}
+```
+
+```js
+// after changes
+{
+  _id: "5f8c17fabb207f0017164033",
+  name: "John Smith",
+}
+```
+
+```js
+// diff doc
+{
+  dId: "5f8c17fabb207f0017164033",
+  v: 1,
+  createdAt: "2020-10-18T10:25:27.279Z",
+  c: [
+    {
+      p: ["name"],
+      k: "E",
+      l: "John Doe",
+      r: "John Smith",
+      i: null
+    }
+  ]
+}
+```
+
+Diffs are represented as one or more change records (`c` field in the doc above). Change record has the following structure:
+
+* `k` - indicates the kind of change; will be one of the following:
+  * `N` - indicates that a new field/element was added.
+  * `D` - indicates that a field/element was deleted.
+  * `E` - indicates that a field/element was edited.
+  * `A` - indicates a change within an array.
+* `p` - the field's path in the original document.
+* `l` - the value before changing (undefined if `k === 'N'`).
+* `r` - the value after changing (undefined if `k === 'D'`).
+* `i` - when `k === 'A'`, indicates the index in an array where the change has occurred.
+* `it` - when `k === 'A'`, contains a nested change record of an array element with index `i`.
+
+-----
+
+ You could exclude specific fields from tracking by adding `track_diff: false` configuration to your field definition inside the Mongoose schema:
 
  ```js
- export const PostSchema: MongooseSchema<PostDoc> = new mongoose.Schema(
+ export const CoderSchema: MongooseSchema<CoderDoc> = new mongoose.Schema(
   {
-    title: {
+    name: {
       type: String,
+      track_diff: false,
     },
-    text: {
-        type: String,
-        track_diff: false,
-    },
-    authors: [
+    skills: [
       {
         name: { type: String }
-        lname: { type: String }, track_diff: false },
       },
     ],
   {
     timestamps: true,
-    collection: 'post',
   }
 );
  ```
 
  The **_id** field is excluded from the tracking by default.
 
+-------
 
-## Track diffs
-
-After adding, the plugin will create a diff document with the following shape in a separate collection on every changing of your  documents.
-
-```js
-{
-    _id: '5c33240bd7cce8cba92030aa',
-    dId: '5c25abc9c9a367742cd5341b',
-    c : [ 
-        {
-            p : [ 
-                'lastname'
-            ],
-            k : 'E',
-            l : 'borodaev',
-            r : 'Borodayev'
-        }
-    ],
-    v: 4,
-    createdAt: '2019-01-07T10:03:55.933Z',
-    updatedAt: '2019-01-07T10:03:55.933Z',
-}
-```
-
-**Important!** Plugin creates diffs on a `preSave` mongoose hook. That's why all methods which directly operates with MongoDB won't invoke creating diff. Also, plugin increment `versionKey` in your collection after any modification.
-
-Diffs are represented as one or more change records. Change records have the following structure:
-
-* `k` - indicates the kind of change; will be one of the following:
-  * `N` - indicates a newly added property/element
-  * `D` - indicates a property/element was deleted
-  * `E` - indicates a property/element was edited
-  * `A` - indicates a change occurred within an array
-* `p` - the property path
-* `l` - the value that was (undefined if `k === 'N'`)
-* `r` - the value that become (undefined if `k === 'D'`)
-* `i` - when `k === 'A'`, indicates the array index where the change occurred
-* `it` - when `k === 'A'`, contains a nested change record indicating the change that occurred at the array index
-
-Under the hood, the plugin uses refactored and simplified algorithm of `deep-diff` package, that is why this plugin has similar structure of changes. You can explore that [repo](https://github.com/flitbit/diff) too if you are interested in.
-
-
-## Methods
-
-Also, the plugin will add a static `diffModel` method that returns the model of diff collection.
+Also, the plugin will add a static `diffModel` method to the original model that returns the model of diff collection.
 
 ```js
-const Diff = Post.diffModel();
+import { type IDiffModel } from 'mongoose-history-diff';
+const CoderDiffModel: IDiffModel  = Coder.diffModel();
 ```
 
-This model contains several static methods as well:
-* `findByDocId(_id: ObjectId)` - finds all diffs by parent doc `_id`
-* `findAfterVersion(_id: ObjectId, v: number)` - finds all diffs by parent doc `_id` after specific version
-* `findBeforeVersion(_id: ObjectId, v: number)` - finds all diffs docs by parent doc `_id` before specific version
-* `revertToVersion(doc: Object, v: number)` - reverts changes of specific doc to a specific version.
-* `mergeDiffs(doc: MongooseDocument)` - return all diffs between current doc state and initial doc state.
+This model contains several static methods (types could be found [here](https://github.com/borodayev/mongoose-history-diff/blob/master/src/types.ts)):
 
-## Contribution
+* `createDiff` method is using internally for creating new diffs, but also exposed in case there will be a necessity to manually save diffs.
 
-Feel free to submit a pull request. Also, be sure all tests have passed otherwise pull request won't be merged.
+  ```js
+  createDiff(dId: ObjectId, v: number, changes: ChangeDoc[]): Promise<IDiffDoc>;
+  ```
+
+* `findByDocId` method is using for finding all diffs related to a particular document.
+
+  ```js
+  findByDocId(dId: ObjectId): Promise<Array<IDiffDoc>>;
+  ```
+
+* `findAfterVersion` method is using for finding all diffs related to a particular document after specific version.
+  ```js
+  findAfterVersion(dId: ObjectId, v: number): Promise<Array<IDiffDoc>>;
+  ```
+
+* `findBeforeVersion` method is using for finding all diffs related to a particular document before a specific version.
+
+  ```js
+  findBeforeVersion(dId: ObjectId, v: number): Promise<Array<IDiffDoc>>;
+  ```
+
+* `revertToVersion` method is using for reverting a particular document to a specific version.
+
+  ```js
+  revertToVersion(d: Object, v: number): Promise<any>;
+  ```
+
+* `mergeDiffs` method is using for getting merged diffs of a particular document among several versions.
+
+  ```js
+  mergeDiffs(doc: Document, opts?: MergedDiffsOptsT): Promise<Array<RawChangeT>>;
+  ```
 
 ## License
 
