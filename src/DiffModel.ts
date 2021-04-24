@@ -50,7 +50,7 @@ export default function (
     }
   );
 
-  const DiffSchema = new Schema(
+  const DiffSchema = new Schema<IDiffDoc, IDiffModel>(
     {
       dId: Schema.Types.ObjectId,
       c: [ChangeSchema],
@@ -65,6 +65,7 @@ export default function (
   DiffSchema.index({ docId: 1, path: 1 });
 
   DiffSchema.statics.createDiff = async function (
+    this: IDiffModel,
     dId: ObjectId,
     v: number,
     changes: ChangeDoc[]
@@ -78,12 +79,14 @@ export default function (
   };
 
   DiffSchema.statics.findByDocId = async function (
+    this: IDiffModel,
     dId: ObjectId
   ): Promise<Array<IDiffDoc>> {
     return this.find({ dId }).exec();
   };
 
   DiffSchema.statics.findAfterVersion = async function (
+    this: IDiffModel,
     dId: ObjectId,
     v: number
   ): Promise<Array<IDiffDoc>> {
@@ -93,6 +96,7 @@ export default function (
   };
 
   DiffSchema.statics.findBeforeVersion = async function (
+    this: IDiffModel,
     dId: ObjectId,
     v: number
   ): Promise<Array<IDiffDoc>> {
@@ -102,12 +106,13 @@ export default function (
   };
 
   DiffSchema.statics.revertToVersion = async function (
+    this: IDiffModel,
     d: { toObject: Function },
     v: number
   ): Promise<any> {
     const doc = typeof d.toObject === 'function' ? d.toObject() : d;
     const changes: Array<RawChangeT> = [];
-    const diffDocs = (await this.findAfterVersion(doc._id, v)) as any;
+    const diffDocs = await this.findAfterVersion(doc._id, v);
 
     if (diffDocs.length === 0) return null;
     diffDocs.forEach((diffDoc: IDiffDoc) => changes.push(...diffDoc.c));
@@ -115,6 +120,7 @@ export default function (
   };
 
   DiffSchema.statics.mergeDiffs = async function (
+    this: IDiffModel,
     doc: {
       toObject: Function;
     },
