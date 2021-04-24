@@ -18,7 +18,7 @@ interface IPostModel extends Model<IPostDoc> {
   createDifferentSubjects(findObj: string, count: number): Promise<void>;
 }
 
-export const PostSchema: Schema<IPostDoc> = new mongoose.Schema(
+export const PostSchema: Schema<IPostDoc, IPostModel> = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -47,11 +47,12 @@ export const PostSchema: Schema<IPostDoc> = new mongoose.Schema(
 
 // for test purposes
 PostSchema.statics.createDifferentSubjects = async function (
+  this: IPostModel,
   title: string,
   count: number
 ): Promise<void> {
   for (let i = 1; i <= count; i += 1) {
-    const post: IPostDoc = await this.findOne({ title }).exec();
+    const post = await this.findOne({ title }).exec();
     if (post) {
       post.subjects.push({ name: `name_${i}` });
       await post.save();
@@ -59,6 +60,6 @@ PostSchema.statics.createDifferentSubjects = async function (
   }
 };
 
-PostSchema.plugin(DiffPlugin);
+PostSchema.plugin(DiffPlugin<IPostDoc>());
 
 export const Post = DB.data.model<IPostDoc, IPostModel>('Post', PostSchema);
