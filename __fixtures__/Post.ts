@@ -1,16 +1,15 @@
 /* eslint-disable no-await-in-loop */
-// @flow
-/* eslint-disable no-param-reassign, func-names */
-
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Document as MongooseDocument, Model } from 'mongoose';
 import DiffPlugin, { IDiffModel } from '../src/index';
 import DB from './db';
 
-DB.init();
+DB.open();
 
-export interface IPostDoc extends Document {
+export interface IPostDoc extends MongooseDocument {
   title: string;
   subjects: Array<{ name: string }>;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface IPostModel extends Model<IPostDoc> {
@@ -18,7 +17,7 @@ interface IPostModel extends Model<IPostDoc> {
   createDifferentSubjects(findObj: string, count: number): Promise<void>;
 }
 
-export const PostSchema: Schema<IPostDoc, IPostModel> = new mongoose.Schema(
+export const PostSchema = new mongoose.Schema<IPostDoc, IPostModel>(
   {
     title: {
       type: String,
@@ -60,6 +59,10 @@ PostSchema.statics.createDifferentSubjects = async function (
   }
 };
 
+// eslint-disable-next-line jest/require-hook
 PostSchema.plugin(DiffPlugin<IPostDoc>());
 
-export const Post = DB.data.model<IPostDoc, IPostModel>('Post', PostSchema);
+export const Post = DB.connection.model<IPostDoc, IPostModel>(
+  'Post',
+  PostSchema
+);

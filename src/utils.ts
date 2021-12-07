@@ -1,6 +1,6 @@
 /* eslint-disable camelcase, no-bitwise, no-param-reassign */
 
-import { Schema } from 'mongoose';
+import mongoose from 'mongoose';
 
 export type ExcludeFieldT = {
   key: string;
@@ -21,7 +21,7 @@ export const excludeFields = (
 };
 
 export const getExcludedFields = (
-  schema: Schema<any>
+  schema: mongoose.Schema<any>
 ): Array<ExcludeFieldT> => {
   const excludedFields: Array<ExcludeFieldT> = [];
 

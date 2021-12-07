@@ -1,5 +1,5 @@
 /* eslint-disable func-names */
-import { Schema, Connection } from 'mongoose';
+import mongoose, { Connection } from 'mongoose';
 import {
   IDiffModel,
   ObjectId,
@@ -17,14 +17,14 @@ export default function (
   if (!mongooseConnection) throw new Error(`'mongooseConnection' is required`);
   if (!collectionName) throw new Error(`'collectionName' is required`);
 
-  const ItemSchema = new Schema(
+  const ItemSchema = new mongoose.Schema(
     {
       k: {
         type: String,
         enum: ['E', 'N', 'D', 'A'],
       },
-      l: Schema.Types.Mixed,
-      r: Schema.Types.Mixed,
+      l: mongoose.Schema.Types.Mixed,
+      r: mongoose.Schema.Types.Mixed,
     },
     {
       _id: false,
@@ -32,15 +32,15 @@ export default function (
     }
   );
 
-  const ChangeSchema = new Schema(
+  const ChangeSchema = new mongoose.Schema(
     {
       k: {
         type: String,
         enum: ['E', 'N', 'D', 'A'],
       },
       p: [String],
-      l: Schema.Types.Mixed,
-      r: Schema.Types.Mixed,
+      l: mongoose.Schema.Types.Mixed,
+      r: mongoose.Schema.Types.Mixed,
       i: Number,
       it: ItemSchema,
     },
@@ -50,9 +50,9 @@ export default function (
     }
   );
 
-  const DiffSchema = new Schema<IDiffDoc, IDiffModel>(
+  const DiffSchema = new mongoose.Schema<IDiffDoc, IDiffModel>(
     {
-      dId: Schema.Types.ObjectId,
+      dId: mongoose.Schema.Types.ObjectId,
       c: [ChangeSchema],
       v: Number,
     },

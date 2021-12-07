@@ -1,15 +1,18 @@
 /* eslint-disable no-param-reassign, func-names */
 
-import { Schema, Model, Document } from 'mongoose';
+import mongoose, { Model, Document as MongooseDocument } from 'mongoose';
 import MHD from './diff';
 import { IDiffModel, OptionsT, RawChangeT, ChangeDoc } from './types';
 import DiffModel from './DiffModel';
 import { getExcludedFields } from './utils';
 
-export default function plugin<T extends Document>() {
-  return function (schema: Schema<T, Model<T>>, options?: OptionsT): void {
+export default function plugin<T extends MongooseDocument>() {
+  return function (
+    schema: mongoose.Schema<T, Model<T>>,
+    options?: OptionsT
+  ): void {
     const versionKey = schema.get('versionKey');
-    if (!versionKey)
+    if (!versionKey || typeof versionKey !== 'string')
       throw new Error(
         `You must provide 'versionKey' option to your schema or remain it as default`
       );

@@ -4,6 +4,7 @@ module.exports = {
     project: ['./tsconfig.eslint.json'],
   },
   extends: [
+    'airbnb-base',
     'airbnb-typescript/base',
     'plugin:import/typescript',
     'plugin:jest/all',
@@ -23,5 +24,16 @@ module.exports = {
     'prettier/prettier': ['error', { 'singleQuote': true }],
     'lines-between-class-members': 1,
     'no-underscore-dangle': 0,
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        'js': 'never',
+        'jsx': 'never',
+        'ts': 'never',
+        'tsx': 'never'
+      }
+   ],
+   'import/no-extraneous-dependencies': ['error']
   }
 }

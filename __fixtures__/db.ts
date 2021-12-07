@@ -1,69 +1,50 @@
 /* eslint-disable no-console */
-
 import mongoose, { Connection } from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
-mongoose.Promise = global.Promise;
+class DB {
+  mongod: MongoMemoryServer;
 
-type DBNames = 'data';
+  connection: Connection = mongoose.createConnection();
 
-export default class DB {
-  static mongoose = mongoose;
-  static consoleErr = console.error;
-  static consoleLog = console.log;
-  static _connectionStr: string;
-
-  static data: Connection = mongoose.createConnection();
-
-  static init(connectionStr?: string) {
-    if (connectionStr) this._connectionStr = connectionStr;
-    return Promise.all([DB.openDB('data')]);
+  constructor(mongod: MongoMemoryServer) {
+    this.mongod = mongod;
   }
 
-  static close() {
-    return Promise.all([DB.closeDB('data')]);
-  }
-
-  static openDB(name: DBNames = 'data'): Promise<Connection> {
+  async open(): Promise<Connection> {
     return new Promise((resolve, reject) => {
-      const uri = process.env.MONGO_CONNECTION_STRING || this._connectionStr;
-      const opts: any = {};
+      const uri = this.mongod.getUri();
 
-      opts.promiseLibrary = global.Promise;
-      opts.autoReconnect = true;
-      opts.reconnectTries = Number.MAX_VALUE;
-      opts.reconnectInterval = 1000;
-      opts.useNewUrlParser = true;
+      this.connection.once('open', () => {
+        console.log(`Successfully connected to ${uri}`);
+        resolve(this.connection);
+      });
 
-      const db: any = DB[name];
-
-      db.consoleErr = DB.consoleErr;
-      db.consoleLog = DB.consoleLog;
-
-      db.on('error', (e: any) => {
+      this.connection.on('error', (e: any) => {
         if (e.message.code === 'ETIMEDOUT') {
-          db.consoleErr(Date.now(), e);
-          db.connect(uri, opts);
+          this.connection.openUri(uri, {});
         }
-        db.consoleErr(e);
+        console.error(Date.now(), e);
       });
 
-      db.once('open', () => {
-        db.consoleLog(`Successfully connected to ${uri}`);
-        resolve(db);
-      });
-      db.once('disconnected', () => {
-        db.consoleLog(`Disconnected from ${uri}`);
+      this.connection.once('disconnected', () => {
+        console.log(`Disconnected from ${uri}`);
         reject();
       });
 
-      db.openUri(uri, opts);
+      this.connection.openUri(uri, {});
     });
   }
 
-  static closeDB(name: DBNames = 'data'): Promise<any> {
-    if (DB[name]) {
-      return DB[name].close();
-    }
-    return Promise.resolve();
+  close(): Promise<any> {
+    return this.connection.close();
+  }
+
+  static async build() {
+    const mongod = await MongoMemoryServer.create();
+    return new DB(mongod);
   }
 }
+
+const db = await DB.build();
+export default db;
