@@ -174,4 +174,24 @@ describe('mongoose-dp', () => {
       `);
     });
   });
+
+  it('with custom fields', async () => {
+    await Post.create({
+      title: 'downcase',
+      subjects: [{ name: 'was' }],
+    });
+    const post: IPostDoc = (await Post.findOne({
+      title: 'downcase',
+    }).exec()) as any;
+    post.title = 'newdowncase';
+    await post.save();
+    const Diff = Post.diffModel();
+    const diffs = await Diff.findByDocId(post._id);
+
+    expect(diffs[0].c).toStrictEqual([
+      { k: 'E', l: 'downcase', p: ['title'], r: 'newdowncase' },
+    ]);
+
+    expect(diffs.upperCasedTitle).toStrictEqual('');
+  });
 });

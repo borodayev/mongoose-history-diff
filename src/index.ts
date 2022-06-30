@@ -1,12 +1,18 @@
 /* eslint-disable no-param-reassign, func-names */
 
-import mongoose, { Model, Document as MongooseDocument } from 'mongoose';
+import mongoose, {
+  Model,
+  Document as MongooseDocument,
+  AnyKeys,
+} from 'mongoose';
 import MHD from './diff';
-import { IDiffModel, OptionsT, RawChangeT, ChangeDoc } from './types';
+import { IDiffModel, OptionsT, RawChangeT, CustomFieldsOptions } from './types';
 import DiffModel from './DiffModel';
 import { getExcludedFields } from './utils';
 
-export default function plugin<T extends MongooseDocument>() {
+export default function plugin<T extends MongooseDocument, R = unknown>(
+  customFieldsOptions?: CustomFieldsOptions<T, R>
+) {
   return function (
     schema: mongoose.Schema<T, Model<T>>,
     options?: OptionsT
@@ -23,7 +29,14 @@ export default function plugin<T extends MongooseDocument>() {
     schema.static('diffModel', function (this: any): IDiffModel {
       const collectionName =
         options?.diffCollectionName || `${this.collection.name}_diff`;
-      return DiffModel(this.collection.conn, collectionName);
+
+      const diffModelOptions = {
+        connection: this.collection.conn,
+        collectionName,
+        customFieldsOptions,
+      };
+
+      return DiffModel<T>(diffModelOptions);
     });
 
     schema.post('init', function (this: any) {
@@ -38,8 +51,24 @@ export default function plugin<T extends MongooseDocument>() {
         const version = this[versionKey] + 1; // cause we're inside preSave hook
         const Diff: IDiffModel = this.constructor.diffModel();
         const diffs: RawChangeT[] = MHD.findDiff(lhs, rhs);
-        if (diffs?.length > 0)
-          await Diff.createDiff(lhs._id, version, <ChangeDoc[]>diffs);
+        const customFields: { [key: string]: AnyKeys<R> } = {};
+
+        if (diffs?.length > 0) {
+          const diff = {
+            dId: lhs._id,
+            v: version,
+            c: diffs,
+          };
+
+          if (customFieldsOptions) {
+            const { values } = customFieldsOptions;
+            Object.keys(values).forEach((k) => {
+              customFields[k] = values[k](rhs);
+            });
+          }
+
+          Diff.createDiff<R>({ ...diff, ...customFields });
+        }
         this._original = null;
       }
     });

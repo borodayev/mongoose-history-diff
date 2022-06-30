@@ -3,3 +3,4 @@ lib/
 coverage/
 .project
 .DS_Store
+.idea/

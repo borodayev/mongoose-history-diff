@@ -11,16 +11,25 @@ jest.setTimeout(30000);
 describe('diff', () => {
   it('create diff model', () => {
     expect(() => {
-      DiffModel(null as any, 'dsc');
+      DiffModel({
+        connection: null,
+        collectionName: 'dsc',
+      });
     }).toThrowErrorMatchingInlineSnapshot(`"'mongooseConnection' is required"`);
 
     expect(() => {
-      DiffModel({} as any, '');
+      DiffModel({
+        connection: DB.connection,
+        collectionName: '',
+      });
     }).toThrowErrorMatchingInlineSnapshot(`"'collectionName' is required"`);
   });
 
   it('createDiff()', async () => {
-    const Diff = DiffModel(DB.connection, 'diffs');
+    const Diff = DiffModel({
+      connection: DB.connection,
+      collectionName: 'diffs',
+    });
 
     const docId = new mongoose.Types.ObjectId();
     const changes: any = [
@@ -28,8 +37,8 @@ describe('diff', () => {
       { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements' } },
     ];
 
-    const diff1 = await Diff.createDiff(docId, 1, changes);
-    const diff2 = await Diff.createDiff(docId, 2, [changes[0]]);
+    const diff1 = await Diff.createDiff({ docId, v: 1, changes });
+    const diff2 = await Diff.createDiff({ docId, v: 2, changes: [changes[0]] });
 
     expect(diff1.v).toBe(1);
     expect(diff2.v).toBe(2);
@@ -81,7 +90,10 @@ describe('diff', () => {
   });
 
   it('findAfterVersion()', async () => {
-    const Diff = DiffModel(DB.connection, 'diffs');
+    const Diff = DiffModel({
+      connection: DB.connection,
+      collectionName: 'diffs',
+    });
 
     const docId = new mongoose.Types.ObjectId();
     const changes: any = [
@@ -89,8 +101,8 @@ describe('diff', () => {
       { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements' } },
     ];
 
-    await Diff.createDiff(docId, 1, changes);
-    await Diff.createDiff(docId, 2, [changes[0]]);
+    await Diff.createDiff({ docId, v: 1, changes });
+    await Diff.createDiff({ docId, v: 2, changes: [changes[0]] });
 
     const tillV1 = await Diff.findAfterVersion(docId, 1);
     const tillV2 = await Diff.findAfterVersion(docId, 2);
