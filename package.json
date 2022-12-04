@@ -30,23 +30,26 @@
   "homepage": "https://github.com/borodayev/mongoose-history-diff",
   "license": "MIT",
   "peerDependencies": {
-    "mongoose": "^5.12.5"
+    "mongoose": "^6.0.14"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.22",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@jest/globals": "^27.4.2",
+    "@types/jest": "^27.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^7.25.0",
-    "eslint-config-airbnb-typescript": "^12.3.1",
+    "eslint": "^8.3.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^16.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jest": "^24.3.5",
-    "eslint-plugin-prettier": "^3.4.0",
-    "jest": "26.6.3",
-    "mongodb-memory-server": "^6.9.6",
+    "eslint-plugin-jest": "^25.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "27.3.1",
+    "mongodb-memory-server": "^8.0.3",
     "prettier": "^2.2.1",
-    "semantic-release": "^17.4.2",
-    "ts-jest": "^26.5.5",
+    "semantic-release": "^18.0.1",
+    "ts-jest": "^27.0.7",
     "typescript": "^4.2.4"
   },
   "publishConfig": {
@@ -59,8 +62,20 @@
   },
   "jest": {
     "testEnvironment": "node",
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
     "transform": {
       "^.+\\.ts$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.test.json",
+        "useESM": true
+      }
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
     },
     "roots": [
       "<rootDir>/src"
@@ -68,10 +83,9 @@
   },
   "scripts": {
     "build": "yarn tsc",
-    "watch": "jest --watch",
-    "coverage": "jest --coverage --maxWorkers 2",
     "lint": "eslint --ext .ts ./src",
-    "test": "yarn coverage && yarn lint",
+    "jest": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "yarn lint && yarn jest --maxWorkers 2",
     "semantic-release": "semantic-release"
   }
 }

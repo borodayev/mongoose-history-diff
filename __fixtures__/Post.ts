@@ -1,16 +1,16 @@
 /* eslint-disable no-await-in-loop */
-// @flow
-/* eslint-disable no-param-reassign, func-names */
 
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Document as MongooseDocument, Model } from 'mongoose';
 import DiffPlugin, { IDiffModel } from '../src/index';
 import DB from './db';
 
-DB.init();
+DB.open();
 
-export interface IPostDoc extends Document {
+export interface IPostDoc extends MongooseDocument {
   title: string;
   subjects: Array<{ name: string }>;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface IPostModel extends Model<IPostDoc> {
@@ -18,7 +18,7 @@ interface IPostModel extends Model<IPostDoc> {
   createDifferentSubjects(findObj: string, count: number): Promise<void>;
 }
 
-export const PostSchema: Schema<IPostDoc, IPostModel> = new mongoose.Schema(
+export const PostSchema = new mongoose.Schema<IPostDoc, IPostModel>(
   {
     title: {
       type: String,
@@ -46,20 +46,40 @@ export const PostSchema: Schema<IPostDoc, IPostModel> = new mongoose.Schema(
 );
 
 // for test purposes
-PostSchema.statics.createDifferentSubjects = async function (
-  this: IPostModel,
-  title: string,
-  count: number
-): Promise<void> {
-  for (let i = 1; i <= count; i += 1) {
-    const post = await this.findOne({ title }).exec();
-    if (post) {
-      post.subjects.push({ name: `name_${i}` });
-      await post.save();
+PostSchema.statics.createDifferentSubjects =
+  async function createDifferentSubjects(
+    this: IPostModel,
+    title: string,
+    count: number
+  ): Promise<void> {
+    for (let i = 1; i <= count; i += 1) {
+      const post = await this.findOne({ title }).exec();
+      if (post) {
+        post.subjects.push({ name: `name_${i}` });
+        await post.save();
+      }
     }
-  }
+  };
+
+type CustomDiffFields = {
+  upperCasedTitle: string;
 };
 
-PostSchema.plugin(DiffPlugin<IPostDoc>());
+// eslint-disable-next-line jest/require-hook
+PostSchema.plugin(
+  DiffPlugin<IPostDoc, CustomDiffFields>({
+    schemaDefinition: {
+      upperCasedTitle: String,
+    },
+    values: {
+      upperCasedTitle: (doc: IPostDoc) => {
+        return 'sdcsdc';
+      },
+    },
+  })
+);
 
-export const Post = DB.data.model<IPostDoc, IPostModel>('Post', PostSchema);
+export const Post = DB.connection.model<IPostDoc, IPostModel>(
+  'Post',
+  PostSchema
+);

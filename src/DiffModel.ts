@@ -1,30 +1,29 @@
 /* eslint-disable func-names */
-import { Schema, Connection } from 'mongoose';
+import mongoose from 'mongoose';
 import {
   IDiffModel,
   ObjectId,
   RawChangeT,
-  ChangeDoc,
   IDiffDoc,
   MergedDiffsOptsT,
+  DiffModelOptions,
+  Diff,
 } from './types';
 import MHD, { revertChanges } from './diff';
 
-export default function (
-  mongooseConnection: Connection,
-  collectionName: string
-): IDiffModel {
-  if (!mongooseConnection) throw new Error(`'mongooseConnection' is required`);
+export default function <T>(options: DiffModelOptions<T>): IDiffModel {
+  const { connection, collectionName, customFieldsOptions } = options;
+  if (!connection) throw new Error(`'connection' is required`);
   if (!collectionName) throw new Error(`'collectionName' is required`);
 
-  const ItemSchema = new Schema(
+  const ItemSchema = new mongoose.Schema(
     {
       k: {
         type: String,
         enum: ['E', 'N', 'D', 'A'],
       },
-      l: Schema.Types.Mixed,
-      r: Schema.Types.Mixed,
+      l: mongoose.Schema.Types.Mixed,
+      r: mongoose.Schema.Types.Mixed,
     },
     {
       _id: false,
@@ -32,15 +31,15 @@ export default function (
     }
   );
 
-  const ChangeSchema = new Schema(
+  const ChangeSchema = new mongoose.Schema(
     {
       k: {
         type: String,
         enum: ['E', 'N', 'D', 'A'],
       },
       p: [String],
-      l: Schema.Types.Mixed,
-      r: Schema.Types.Mixed,
+      l: mongoose.Schema.Types.Mixed,
+      r: mongoose.Schema.Types.Mixed,
       i: Number,
       it: ItemSchema,
     },
@@ -50,11 +49,12 @@ export default function (
     }
   );
 
-  const DiffSchema = new Schema<IDiffDoc, IDiffModel>(
+  const DiffSchema = new mongoose.Schema<IDiffDoc, IDiffModel>(
     {
-      dId: Schema.Types.ObjectId,
+      dId: mongoose.Schema.Types.ObjectId,
       c: [ChangeSchema],
       v: Number,
+      ...(customFieldsOptions ? customFieldsOptions.schemaDefinition : {}),
     },
     {
       versionKey: false,
@@ -64,16 +64,12 @@ export default function (
   );
   DiffSchema.index({ docId: 1, path: 1 });
 
-  DiffSchema.statics.createDiff = async function (
+  DiffSchema.statics.createDiff = async function <CustomFields>(
     this: IDiffModel,
-    dId: ObjectId,
-    v: number,
-    changes: ChangeDoc[]
+    diffOptions: Diff & CustomFields
   ): Promise<IDiffDoc> {
     const doc = new this({
-      dId,
-      c: changes,
-      v,
+      ...diffOptions,
     });
     return doc.save();
   };
@@ -160,13 +156,10 @@ export default function (
   const modelName: string = `${collectionName}_Model`;
   let Model: IDiffModel;
 
-  if (mongooseConnection.modelNames().includes(modelName)) {
-    Model = <IDiffModel>mongooseConnection.models[modelName];
+  if (connection.modelNames().includes(modelName)) {
+    Model = <IDiffModel>connection.models[modelName];
   } else {
-    Model = mongooseConnection.model<IDiffDoc, IDiffModel>(
-      modelName,
-      DiffSchema
-    );
+    Model = connection.model<IDiffDoc, IDiffModel>(modelName, DiffSchema);
   }
 
   return Model;

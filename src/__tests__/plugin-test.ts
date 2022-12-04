@@ -1,5 +1,5 @@
-/* eslint-disable jest/no-truthy-falsy */
 /* eslint-disable jest/prefer-expect-assertions */
+import { jest } from '@jest/globals';
 import { Post, IPostDoc } from '../../__fixtures__/Post';
 
 jest.mock('../../__fixtures__/db.ts');
@@ -36,7 +36,7 @@ describe('mongoose-dp', () => {
 
     expect(Array.isArray(diffs)).toBeTruthy();
     expect(diffs[0].c).toMatchInlineSnapshot(`
-      CoreDocumentArray [
+      Array [
         Object {
           "k": "E",
           "l": "test",
@@ -85,7 +85,7 @@ describe('mongoose-dp', () => {
       const Diff = Post.diffModel();
       const diffs = await Diff.findByDocId(post._id);
       expect(diffs[0].c).toMatchInlineSnapshot(`
-        CoreDocumentArray [
+        Array [
           Object {
             "i": 1,
             "it": Object {
@@ -117,7 +117,7 @@ describe('mongoose-dp', () => {
       const Diff = Post.diffModel();
       const diffs = await Diff.findByDocId(post._id);
       expect(diffs[0].c).toMatchInlineSnapshot(`
-        CoreDocumentArray [
+        Array [
           Object {
             "k": "E",
             "l": "was",
@@ -146,7 +146,7 @@ describe('mongoose-dp', () => {
       const Diff = Post.diffModel();
       const diffs = await Diff.findByDocId(post._id);
       expect(diffs[0].c).toMatchInlineSnapshot(`
-        CoreDocumentArray [
+        Array [
           Object {
             "i": 2,
             "it": Object {
@@ -173,5 +173,25 @@ describe('mongoose-dp', () => {
         ]
       `);
     });
+  });
+
+  it('with custom fields', async () => {
+    await Post.create({
+      title: 'downcase',
+      subjects: [{ name: 'was' }],
+    });
+    const post: IPostDoc = (await Post.findOne({
+      title: 'downcase',
+    }).exec()) as any;
+    post.title = 'newdowncase';
+    await post.save();
+    const Diff = Post.diffModel();
+    const diffs = await Diff.findByDocId(post._id);
+
+    expect(diffs[0].c).toStrictEqual([
+      { k: 'E', l: 'downcase', p: ['title'], r: 'newdowncase' },
+    ]);
+
+    expect(diffs.upperCasedTitle).toStrictEqual('');
   });
 });

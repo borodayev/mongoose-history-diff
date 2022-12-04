@@ -1,6 +1,6 @@
-/* eslint-disable jest/no-truthy-falsy */
 /* eslint-disable jest/prefer-expect-assertions */
 import mongoose from 'mongoose';
+import { jest } from '@jest/globals';
 import DB from '../../__fixtures__/db';
 import DiffModel from '../DiffModel';
 import { Post, IPostDoc } from '../../__fixtures__/Post';
@@ -9,29 +9,36 @@ jest.mock('../../__fixtures__/db.ts');
 jest.setTimeout(30000);
 
 describe('diff', () => {
-  DB.init();
-
   it('create diff model', () => {
     expect(() => {
-      DiffModel(null as any, 'dsc');
+      DiffModel({
+        connection: null,
+        collectionName: 'dsc',
+      });
     }).toThrowErrorMatchingInlineSnapshot(`"'mongooseConnection' is required"`);
 
     expect(() => {
-      DiffModel({} as any, '');
+      DiffModel({
+        connection: DB.connection,
+        collectionName: '',
+      });
     }).toThrowErrorMatchingInlineSnapshot(`"'collectionName' is required"`);
   });
 
   it('createDiff()', async () => {
-    const Diff = DiffModel(DB.data, 'diffs');
+    const Diff = DiffModel({
+      connection: DB.connection,
+      collectionName: 'diffs',
+    });
 
-    const docId = mongoose.Types.ObjectId();
+    const docId = new mongoose.Types.ObjectId();
     const changes: any = [
       { k: 'E', p: ['details', 'with', '2'], l: 'elements', r: 'more' },
       { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements' } },
     ];
 
-    const diff1 = await Diff.createDiff(docId, 1, changes);
-    const diff2 = await Diff.createDiff(docId, 2, [changes[0]]);
+    const diff1 = await Diff.createDiff({ docId, v: 1, changes });
+    const diff2 = await Diff.createDiff({ docId, v: 2, changes: [changes[0]] });
 
     expect(diff1.v).toBe(1);
     expect(diff2.v).toBe(2);
@@ -40,7 +47,7 @@ describe('diff', () => {
     expect((diff2 as any).updatedAt).toBeUndefined();
 
     expect(diff1.c).toMatchInlineSnapshot(`
-      CoreDocumentArray [
+      Array [
         Object {
           "k": "E",
           "l": "elements",
@@ -67,7 +74,7 @@ describe('diff', () => {
     `);
 
     expect(diff2.c).toMatchInlineSnapshot(`
-      CoreDocumentArray [
+      Array [
         Object {
           "k": "E",
           "l": "elements",
@@ -83,21 +90,24 @@ describe('diff', () => {
   });
 
   it('findAfterVersion()', async () => {
-    const Diff = DiffModel(DB.data, 'diffs');
+    const Diff = DiffModel({
+      connection: DB.connection,
+      collectionName: 'diffs',
+    });
 
-    const docId = mongoose.Types.ObjectId();
+    const docId = new mongoose.Types.ObjectId();
     const changes: any = [
       { k: 'E', p: ['details', 'with', '2'], l: 'elements', r: 'more' },
       { k: 'A', p: ['details', 'with'], i: 3, it: { k: 'N', r: 'elements' } },
     ];
 
-    await Diff.createDiff(docId, 1, changes);
-    await Diff.createDiff(docId, 2, [changes[0]]);
+    await Diff.createDiff({ docId, v: 1, changes });
+    await Diff.createDiff({ docId, v: 2, changes: [changes[0]] });
 
     const tillV1 = await Diff.findAfterVersion(docId, 1);
     const tillV2 = await Diff.findAfterVersion(docId, 2);
     expect(tillV1[0].c).toMatchInlineSnapshot(`
-      CoreDocumentArray [
+      Array [
         Object {
           "k": "E",
           "l": "elements",
@@ -111,7 +121,7 @@ describe('diff', () => {
       ]
     `);
     expect(tillV1[1].c).toMatchInlineSnapshot(`
-      CoreDocumentArray [
+      Array [
         Object {
           "k": "E",
           "l": "elements",
@@ -138,7 +148,7 @@ describe('diff', () => {
     `);
 
     expect(tillV2[0].c).toMatchInlineSnapshot(`
-      CoreDocumentArray [
+      Array [
         Object {
           "k": "E",
           "l": "elements",
@@ -174,7 +184,7 @@ describe('diff', () => {
 
     expect(post2.title).toBe('updated2');
     expect(post2.subjects).toMatchInlineSnapshot(`
-      CoreDocumentArray [
+      Array [
         Object {
           "name": "math2",
         },
@@ -267,14 +277,8 @@ describe('diff', () => {
       await Post.createDifferentSubjects('test2', 5);
       const post = (await Post.findOne({ title: 'test2' }).exec()) as IPostDoc;
 
-      const {
-        diff1,
-        diff2,
-        diff3,
-        diff4,
-        diff5,
-        diff6,
-      } = await getMerdgedDiffs(post, 'startVersion');
+      const { diff1, diff2, diff3, diff4, diff5, diff6 } =
+        await getMerdgedDiffs(post, 'startVersion');
 
       expect(diff1).toStrictEqual([
         {
@@ -383,14 +387,8 @@ describe('diff', () => {
       await Post.create({ title: 'test3', subjects: [] });
       await Post.createDifferentSubjects('test3', 5);
       const post = (await Post.findOne({ title: 'test3' }).exec()) as IPostDoc;
-      const {
-        diff1,
-        diff2,
-        diff3,
-        diff4,
-        diff5,
-        diff6,
-      } = await getMerdgedDiffs(post, 'endVersion');
+      const { diff1, diff2, diff3, diff4, diff5, diff6 } =
+        await getMerdgedDiffs(post, 'endVersion');
       expect(diff1).toStrictEqual([]);
       expect(diff2).toStrictEqual([
         {

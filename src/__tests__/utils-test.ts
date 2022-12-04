@@ -1,4 +1,3 @@
-/* eslint-disable jest/no-truthy-falsy */
 /* eslint-disable jest/prefer-expect-assertions */
 import {
   getExcludedFields,

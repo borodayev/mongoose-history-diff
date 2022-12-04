@@ -28,11 +28,12 @@ export type DeepDiffOptsT = {
 export const deepDiff = (
   lhs: any,
   rhs: any,
-  changes: Array<RawChangeT> = [],
+  changes: Array<RawChangeT>,
   opts: DeepDiffOptsT
 ): void => {
   const { path, prefilter, key, orderIndependent } = opts || {};
   let { stack } = opts || {};
+  changes = changes || [];
   stack = stack || [];
   const currentPath = path ? [...path] : [];
 
